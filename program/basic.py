@@ -21,16 +21,20 @@ def get_tsne(file_name):
     calculate tsne from file, and save data into pickle."
     last modified
     """
-    _pickle_file = "pickles/" + file_name + ".pkl"
+    _pickle_file = "pickles/tsne." + file_name + ".pkl"
     if os.path.exists(_pickle_file):
         with open(_pickle_file, "rb") as f:
             return pickle.load(f)
     else:
         raw_data = get_data(file_name)
+
+        ID_column = raw_data[["#OTU ID"]]
+        raw_data.drop(["#OTU ID"], axis="columns", inplace=True)
+
         tsne = pandas.DataFrame(data=sklearn.manifold.TSNE(n_components=2, random_state=0).fit_transform(raw_data), columns=["TSNE-1", "TSNE-2"])
         tsne["TSNE-1"] = scipy.stats.zscore(tsne["TSNE-1"])
         tsne["TSNE-2"] = scipy.stats.zscore(tsne["TSNE-2"])
-        tsne["id"] = raw_data["#OTU ID"]
+        tsne["id"] = ID_column
 
         with open(_pickle_file, "wb") as f:
             pickle.dump(tsne, f)
@@ -39,5 +43,6 @@ def get_tsne(file_name):
 
 
 if __name__ == "__main__":
-    for filename in ["1.tsv", "2.tsv"]:
-        print(get_tsne(filename))
+    for file_name in ["1.tsv", "2.tsv"]:
+        print(get_data(file_name).columns)
+        print(get_tsne(file_name))
