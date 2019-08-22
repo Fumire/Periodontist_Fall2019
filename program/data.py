@@ -5,6 +5,11 @@ import scipy
 import sklearn
 import sklearn.manifold
 
+"""
+get and save data with this module.:w
+
+"""
+
 
 def get_data(file_name):
     """
@@ -19,7 +24,7 @@ def get_data(file_name):
 def get_tsne(file_name):
     """
     calculate tsne from file, and save data into pickle."
-    last modified
+    last modified: 2019-08-22T13:45:27+0900
     """
     _pickle_file = "pickles/tsne." + file_name + ".pkl"
     if os.path.exists(_pickle_file):
