@@ -6,7 +6,7 @@ import sklearn
 import sklearn.manifold
 
 """
-get and save data with this module.:w
+get and save data with this module.
 
 """
 
