@@ -1,6 +1,8 @@
 import time
 import matplotlib
 import matplotlib.pyplot
+import numpy
+import classification
 import data
 
 """
@@ -67,6 +69,43 @@ def draw_tsne_with_marker(file_name):
     fig.savefig("figures/" + "MarkerTSNE" + current_time() + ".png")
 
 
+def draw_feature_importances(file_name, level=6):
+    """
+    draw feature importances plot.
+    last modified: 
+    """
+    raw_data = classification.get_feature_importances(file_name, level=level)
+
+    values = list(map(lambda x: x[0], raw_data))
+
+    matplotlib.use("Agg")
+    matplotlib.rcParams.update({"font.size": 30})
+
+    matplotlib.pyplot.figure()
+    for i, value in enumerate(values):
+        matplotlib.pyplot.bar(i, value)
+
+    mean = numpy.mean(values)
+    matplotlib.pyplot.plot([-1, len(values) + 1], [mean, mean], "k-", label="mean")
+
+    for label, value, linestyle in zip(["75%", "50%", "25%"], numpy.percentile(values, [25, 50, 75]), ["--", "-.", ":", ""]):
+        matplotlib.pyplot.plot([-1, len(values) + 1], [value, value], "k" + linestyle, label=label)
+
+    matplotlib.pyplot.title("Feature Importances: " + file_name)
+    matplotlib.pyplot.xlabel("Features")
+    matplotlib.pyplot.ylabel("Importances")
+    matplotlib.pyplot.grid(True)
+    matplotlib.pyplot.legend()
+    matplotlib.pyplot.xticks([])
+    matplotlib.pyplot.ylim(0, 0.25)
+
+    fig = matplotlib.pyplot.gcf()
+    fig.set_size_inches(32, 18)
+    fig.savefig("figures/" + "FeatureImportances" + current_time() + ".png")
+
+
 if __name__ == "__main__":
     for file_name in ["1.tsv", "2.tsv"]:
-        draw_tsne_with_marker(file_name)
+        for i in range(1, 7):
+            draw_feature_importances(file_name, i)
+            print(file_name, i)
