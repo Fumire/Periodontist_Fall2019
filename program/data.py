@@ -7,7 +7,6 @@ import sklearn.manifold
 
 """
 get and save data with this module.
-
 """
 
 
@@ -63,11 +62,12 @@ def make_class_column(raw_data):
 def merge_columns(raw_data, level):
     """
     merge columns with level
-    last modified: 2019-08-26T16:37:05+0900
+    last modified: 2019-08-26T22:55:01+0900
     """
     if level < 0 or level > 6:
         raise ValueError
-    elif level == 6:
+
+    if level == 6:
         return raw_data
 
     columns = list(map(lambda x: x.split(";"), raw_data.columns))
@@ -86,14 +86,27 @@ def merge_columns(raw_data, level):
     return raw_data
 
 
+def formatting_column(raw_data):
+    """
+    removing [, ], and < in column name
+    last modifited: 2019-08-26T22:58:55+0900
+    """
+    columns = list(map(lambda x: x.replace("[", "").replace("]", "").replace("<", ""), list(raw_data.columns)))
+
+    raw_data.columns = columns
+
+    return raw_data
+
+
 def processed_data(file_name, level=6):
     """
     return proceesed data which is ready to use
-    last modified: 2019-08-26T15:02:09+0900
+    last modified: 2019-08-26T22:58:36+0900
     """
     data = get_data(file_name)
     data = merge_columns(data, level)
     data = make_class_column(data)
+    data = formatting_column(data)
 
     return data
 
