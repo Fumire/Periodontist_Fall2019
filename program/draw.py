@@ -3,6 +3,10 @@ import matplotlib
 import matplotlib.pyplot
 import data
 
+"""
+draw any data into PNG
+"""
+
 
 def current_time():
     """
@@ -35,10 +39,11 @@ def draw_tsne(file_name):
     fig.set_size_inches(24, 24)
     fig.savefig("figures/" + "TSNE" + current_time() + ".png")
 
+
 def draw_tsne_with_marker(file_name):
     """
     draw TSNE plot with marker.
-    last modified: 
+    last modified: 2019-08-26T14:05:52+0900
     """
     raw_data = data.processed_data(file_name)
     tsne_data = data.get_tsne(file_name)
