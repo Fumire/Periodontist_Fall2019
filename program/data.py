@@ -63,29 +63,30 @@ def make_class_column(raw_data):
 def merge_columns(raw_data, level):
     """
     merge columns with level
-    last modified: 2019-08-26T15:22:41+0900
+    last modified: 2019-08-26T16:37:05+0900
     """
     if level < 0 or level > 6:
         raise ValueError
+    elif level == 6:
+        return raw_data
 
     columns = list(map(lambda x: x.split(";"), raw_data.columns))
     for i, column in enumerate(columns):
         columns[i] = ";".join(column[:level + 1])
     columns = sorted(list(set(columns)))
 
-    raw_columns = raw_data.columns
+    raw_columns = list(raw_data.columns)
     for column in columns:
         selected_columns = list(filter(lambda x: x.startswith(column), raw_columns))
-        selected_data = raw_data[selected_columns].sum(axis=1)
+        raw_data[column] = raw_data.loc[:, selected_columns].sum(axis=1)
 
-        raw_data[column] = selected_data
-        for col in selected_columns:
-            del raw_data[col]
+    for column in raw_columns:
+        del raw_data[column]
 
     return raw_data
 
 
-def processed_data(file_name, level):
+def processed_data(file_name, level=6):
     """
     return proceesed data which is ready to use
     last modified: 2019-08-26T15:02:09+0900
@@ -99,4 +100,4 @@ def processed_data(file_name, level):
 
 if __name__ == "__main__":
     for file_name in ["1.tsv", "2.tsv"]:
-        print(processed_data(file_name, 1))
+        print(processed_data(file_name, 5))
