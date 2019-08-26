@@ -14,9 +14,15 @@ get and save data with this module.:w
 def get_data(file_name):
     """
     get data from file.
-    last modified: 2019-08-21T11:30:57+0900
+    last modified: 2019-08-26T11:37:32+0900
     """
     data = pandas.read_csv("data/" + file_name, sep="\t", skiprows=1)
+
+    pathogen_column = data["#OTU ID"].tolist()
+    data.drop(columns=["#OTU ID"], inplace=True)
+
+    data = data.transpose()
+    data.columns = pathogen_column
 
     return data
 
@@ -24,7 +30,7 @@ def get_data(file_name):
 def get_tsne(file_name):
     """
     calculate tsne from file, and save data into pickle."
-    last modified: 2019-08-22T13:45:27+0900
+    last modified: 2019-08-26T11:37:38+0900
     """
     _pickle_file = "pickles/tsne." + file_name + ".pkl"
     if os.path.exists(_pickle_file):
@@ -33,8 +39,7 @@ def get_tsne(file_name):
     else:
         raw_data = get_data(file_name)
 
-        ID_column = raw_data[["#OTU ID"]]
-        raw_data.drop(["#OTU ID"], axis="columns", inplace=True)
+        ID_column = raw_data.index
 
         tsne = pandas.DataFrame(data=sklearn.manifold.TSNE(n_components=2, random_state=0).fit_transform(raw_data), columns=["TSNE-1", "TSNE-2"])
         tsne["TSNE-1"] = scipy.stats.zscore(tsne["TSNE-1"])
@@ -47,7 +52,26 @@ def get_tsne(file_name):
         return tsne
 
 
+def make_class_column(raw_data):
+    """
+    make class column for classification
+    last modified: 2019-08-26T11:53:07+0900
+    """
+    return raw_data.assign(classification=list(map(lambda x: x[:-2], raw_data.index)))
+
+
+def processed_data(file_name):
+    """
+    return proceesed data which is ready to use
+    last modified: 2019-08-26T11:54:06+0900
+    """
+    data = get_data(file_name)
+    data = make_class_column(data)
+
+    return data
+
+
 if __name__ == "__main__":
     for file_name in ["1.tsv", "2.tsv"]:
-        print(get_data(file_name).columns)
-        print(get_tsne(file_name))
+        data = processed_data(file_name)
+        print(data)
