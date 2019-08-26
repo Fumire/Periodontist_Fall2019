@@ -29,7 +29,7 @@ def get_data(file_name):
 
 def get_tsne(file_name):
     """
-    calculate tsne from file, and save data into pickle."
+    calculate tsne from file, and save data into pickle.
     last modified: 2019-08-26T13:13:42+0900
     """
     _pickle_file = "pickles/tsne." + file_name + ".pkl"
@@ -60,12 +60,38 @@ def make_class_column(raw_data):
     return raw_data.assign(classification=list(map(lambda x: x[:-3] if x[-3] == "1" else x[:-2], raw_data.index)))
 
 
-def processed_data(file_name):
+def merge_columns(raw_data, level):
+    """
+    merge columns with level
+    last modified: 2019-08-26T15:22:41+0900
+    """
+    if level < 0 or level > 6:
+        raise ValueError
+
+    columns = list(map(lambda x: x.split(";"), raw_data.columns))
+    for i, column in enumerate(columns):
+        columns[i] = ";".join(column[:level + 1])
+    columns = sorted(list(set(columns)))
+
+    raw_columns = raw_data.columns
+    for column in columns:
+        selected_columns = list(filter(lambda x: x.startswith(column), raw_columns))
+        selected_data = raw_data[selected_columns].sum(axis=1)
+
+        raw_data[column] = selected_data
+        for col in selected_columns:
+            del raw_data[col]
+
+    return raw_data
+
+
+def processed_data(file_name, level):
     """
     return proceesed data which is ready to use
-    last modified: 2019-08-26T11:54:06+0900
+    last modified: 2019-08-26T15:02:09+0900
     """
     data = get_data(file_name)
+    data = merge_columns(data, level)
     data = make_class_column(data)
 
     return data
@@ -73,4 +99,4 @@ def processed_data(file_name):
 
 if __name__ == "__main__":
     for file_name in ["1.tsv", "2.tsv"]:
-        print(get_tsne(file_name))
+        print(processed_data(file_name, 1))
