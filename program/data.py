@@ -101,7 +101,7 @@ def formatting_column(raw_data):
 def processed_data(file_name, level=6):
     """
     return proceesed data which is ready to use
-    last modified: 2019-08-26T22:58:36+0900
+    last modified: 2019-08-28T12:31:11+0900
     """
     data = get_data(file_name)
     data = merge_columns(data, level)
