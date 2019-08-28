@@ -72,7 +72,7 @@ def draw_tsne_with_marker(file_name):
 def draw_feature_importances(file_name, level=6):
     """
     draw feature importances plot.
-    last modified: 
+    last modified: 2019-08-27T18:36:23+0900
     """
     raw_data = classification.get_feature_importances(file_name, level=level)
 
