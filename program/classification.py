@@ -62,7 +62,7 @@ def change_number_to_feature(file_name, number, level=6):
 def run_test(function, file_name, level, processes=100):
     """
     execute test for given function.
-    last modified: 2019-08-27T18:57:10+0900
+    last modified: 2019-08-28T12:30:29+0900
     """
     features = get_features(file_name, level)
     print(len(features))
@@ -70,7 +70,7 @@ def run_test(function, file_name, level, processes=100):
     with multiprocessing.Pool(processes=processes) as pool:
         score = pool.starmap(function, [(file_name, i, level, True) for i in range(1, 2 ** len(features))])
     best = int(numpy.argmax(score)) + 1
-    combination = change_number_to_feature(file_name, best, level)
+    combination = sorted(change_number_to_feature(file_name, best, level))
 
     print(max(score), best, combination)
 
@@ -78,28 +78,28 @@ def run_test(function, file_name, level, processes=100):
 def classification_with_XGBClassifier(file_name, number, level, return_score=True):
     """
     classification with XGBClassifier
-    last modified: 2019-08-27T17:55:02+0900
+    last modified: 2019-08-28T12:41:17+0900
     """
-    raw_data = data.processed_data(file_name, level=level)
-
-    selected_features = change_number_to_feature(file_name, number, level)
-    raw_data = raw_data[selected_features + ["classification"]]
-
-    x_train = raw_data.drop(columns=["classification"])
-    y_train = raw_data["classification"]
-
     _pickle_file = "pickles/classification_with_XGBClassifier_" + file_name + "_" + str(number) + "_" + str(level) + ".pkl"
     if os.path.exists(_pickle_file):
         with open(_pickle_file, "rb") as f:
-            y_test = pickle.load(f)
+            y_train, y_test = pickle.load(f)
     else:
+        raw_data = data.processed_data(file_name=file_name, level=level)
+
+        selected_features = change_number_to_feature(file_name, number, level)
+        raw_data = raw_data[selected_features + ["classification"]]
+
+        x_train = raw_data.drop(columns=["classification"])
+        y_train = raw_data["classification"]
+
         model = xgboost.XGBClassifier(random_state=0)
         model.fit(x_train, y_train, verbose=False)
 
         y_test = model.predict(x_train)
 
         with open(_pickle_file, "wb") as f:
-            pickle.dump(y_test, f)
+            pickle.dump((y_train, y_test), f)
 
     if return_score:
         return numpy.mean(list(map(lambda i: 1 if y_test[i] == y_train[i] else 0, range(len(y_test)))))
@@ -108,5 +108,5 @@ def classification_with_XGBClassifier(file_name, number, level, return_score=Tru
 
 
 if __name__ == "__main__":
-    run_test(classification_with_XGBClassifier, "1.tsv", 2)
-    run_test(classification_with_XGBClassifier, "2.tsv", 2)
+    run_test(classification_with_XGBClassifier, "1.tsv", 1)
+    run_test(classification_with_XGBClassifier, "2.tsv", 1)
