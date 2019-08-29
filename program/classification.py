@@ -84,7 +84,7 @@ def run_test(function, file_name, level, processes=100, k_fold=5):
     print(max(score), best, level, combination)
 
 
-def classification_with_XGBClassifier(file_name, number, level, return_score=True, k_fold=5):
+def classification_with_XGBClassifier(file_name, number, level, return_score=True, k_fold=5, verbose=False):
     """
     classification with XGBClassifier
     last modified: 2019-08-29T13:40:37+0900
@@ -102,8 +102,12 @@ def classification_with_XGBClassifier(file_name, number, level, return_score=Tru
 
         y_answer, y_predict = list(), list()
         for i in range(k_fold):
-            train_data = pandas.concat(list(map(lambda x: folded_data[i], list(filter(lambda x: x != i, range(k_fold))))), ignore_index=True)
+            train_data = pandas.concat(list(map(lambda x: folded_data[i], list(filter(lambda x: x != i, range(k_fold))))))
             test_data = folded_data[i]
+
+            if verbose:
+                print(train_data)
+                print(test_data)
 
             x_train, y_train = train_data.drop(columns=["classification"]), train_data["classification"]
             x_test, y_test = test_data.drop(columns=["classification"]), test_data["classification"]
@@ -126,5 +130,5 @@ def classification_with_XGBClassifier(file_name, number, level, return_score=Tru
 
 
 if __name__ == "__main__":
-    run_test(classification_with_XGBClassifier, "1.tsv", 6)
-    run_test(classification_with_XGBClassifier, "2.tsv", 6)
+    run_test(classification_with_XGBClassifier, "1.tsv", 5)
+    run_test(classification_with_XGBClassifier, "2.tsv", 5)
