@@ -99,15 +99,28 @@ def formatting_column(raw_data):
     return raw_data
 
 
+def drop_columns(raw_data):
+    """
+    drop columns which ends with "s__" or "__" such as "D_0__Bacteria;D_1__Bacteroidetes;D_2__Bacteroidia;D_3__Bacteroidales;D_4__Porphyromonadaceae;D_5__Porphyromonas;__"
+    last modified: 2019-08-29T14:02:28+0900
+    """
+    for column in list(raw_data.columns):
+        if column.split(";")[-1] in ["__", "s__"]:
+            del raw_data[column]
+
+    return raw_data
+
+
 def processed_data(file_name, level=6, for_validation=False, k_fold=5):
     """
     return proceesed data which is ready to use
-    last modified: 2019-08-29T13:34:39+0900
+    last modified: 2019-08-29T14:02:53+0900
     """
     data = get_data(file_name)
     data = merge_columns(data, level)
     data = make_class_column(data)
     data = formatting_column(data)
+    data = drop_columns(data)
 
     if for_validation:
         numpy.random.seed(0)
