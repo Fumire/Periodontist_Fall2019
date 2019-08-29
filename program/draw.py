@@ -45,7 +45,7 @@ def draw_tsne(file_name):
 def draw_tsne_with_marker(file_name):
     """
     draw TSNE plot with marker.
-    last modified: 2019-08-26T14:05:52+0900
+    last modified: 2019-08-29T18:16:18+0900
     """
     raw_data = data.processed_data(file_name)
     tsne_data = data.get_tsne(file_name)
@@ -54,15 +54,15 @@ def draw_tsne_with_marker(file_name):
     matplotlib.rcParams.update({"font.size": 30})
 
     matplotlib.pyplot.figure()
-    for color, item in zip(["0.25", "0.50", "0.75", "1.00"], ["H", "CPE", "CPM", "CPS"]):
+    for color, item in zip(["g", "b", "r", "k"], ["H", "CPE", "CPM", "CPS"]):
         selected_data = tsne_data.loc[raw_data["classification"] == item]
-        matplotlib.pyplot.scatter(selected_data["TSNE-1"], selected_data["TSNE-2"], c=color, edgecolor='k', label=item)
+        matplotlib.pyplot.scatter(selected_data["TSNE-1"], selected_data["TSNE-2"], c=color, marker="$%s$" % item[-1], s=200, label=item)
 
     matplotlib.pyplot.title("TSNE map: " + file_name)
     matplotlib.pyplot.xlabel("Standardized TSNE-1")
     matplotlib.pyplot.ylabel("Standardized TSNE-2")
-    matplotlib.pyplot.legend()
     matplotlib.pyplot.grid(True)
+    matplotlib.pyplot.legend()
 
     fig = matplotlib.pyplot.gcf()
     fig.set_size_inches(24, 24)
@@ -104,8 +104,69 @@ def draw_feature_importances(file_name, level=6):
     fig.savefig("figures/" + "FeatureImportances" + current_time() + ".png")
 
 
+def draw_prediction(function, file_name, level, k_fold=5):
+    """
+    draw prediction
+    reference: https://scikit-learn.org/stable/auto_examples/svm/plot_custom_kernel.html#sphx-glr-auto-examples-svm-plot-custom-kernel-py
+    last modified: 2019-08-29T18:39:05+0900
+    """
+    best, level = classification.run_test(function, file_name, level, k_fold=k_fold)
+    y_answer, y_predict, y_index = function(file_name=file_name, number=best, level=level, return_score=False, k_fold=k_fold)
+    score = function(file_name=file_name, number=best, level=level, k_fold=k_fold)
+    tsne = data.get_tsne(file_name)
+    label = {"H": "g", "CPE": "b", "CPM": "r", "CPS": "k"}
+
+    matplotlib.use("Agg")
+    matplotlib.rcParams.update({"font.size": 30})
+
+    matplotlib.pyplot.figure()
+    for i in y_index:
+        matplotlib.pyplot.scatter(tsne.iloc[i, 0], tsne.iloc[i, 1], c=label[y_predict.iloc[i]], s=200, marker="$%s$" % y_answer.iloc[i][-1])
+
+    matplotlib.pyplot.title(function.__name__ + ": %.2f" % score)
+    matplotlib.pyplot.xlabel("Standardized TSNE-1")
+    matplotlib.pyplot.ylabel("Standardized TSNE-2")
+    matplotlib.pyplot.grid(True)
+
+    fig = matplotlib.pyplot.gcf()
+    fig.set_size_inches(24, 24)
+    fig.savefig("figures/" + "Prediction" + current_time() + ".png")
+
+
+def draw_prediction_binary(function, file_name, level, k_fold=5):
+    """
+    draw prediction in OX
+    last modified: 2019-08-29T18:38:56+0900
+    """
+    best, level = classification.run_test(function, file_name, level, k_fold=k_fold)
+    y_answer, y_predict, y_index = function(file_name=file_name, number=best, level=level, return_score=False, k_fold=k_fold)
+    score = function(file_name=file_name, number=best, level=level, k_fold=k_fold)
+    tsne = data.get_tsne(file_name)
+    label = {"H": "g", "CPE": "b", "CPM": "r", "CPS": "k"}
+
+    matplotlib.use("Agg")
+    matplotlib.rcParams.update({"font.size": 30})
+
+    matplotlib.pyplot.figure()
+    for i in y_index:
+        if y_predict.iloc[i] == y_answer.iloc[i]:
+            matplotlib.pyplot.scatter(tsne.iloc[i, 0], tsne.iloc[i, 1], c=label[y_answer.iloc[i]], s=200, marker="o")
+        else:
+            matplotlib.pyplot.scatter(tsne.iloc[i, 0], tsne.iloc[i, 1], c=label[y_answer.iloc[i]], s=200, marker="X")
+
+    matplotlib.pyplot.title(function.__name__ + ": %.2f" % score)
+    matplotlib.pyplot.xlabel("Standardized TSNE-1")
+    matplotlib.pyplot.ylabel("Standardized TSNE-2")
+    matplotlib.pyplot.grid(True)
+
+    fig = matplotlib.pyplot.gcf()
+    fig.set_size_inches(24, 24)
+    fig.savefig("figures/" + "PredictionOX" + current_time() + ".png")
+
+
 if __name__ == "__main__":
     for file_name in ["1.tsv", "2.tsv"]:
-        for i in range(1, 7):
-            draw_feature_importances(file_name, i)
-            print(file_name, i)
+        draw_tsne_with_marker(file_name)
+        for function in [classification.classification_with_SVC, classification.classification_with_XGBClassifier]:
+            draw_prediction(function, file_name, 5)
+            draw_prediction_binary(function, file_name, 5)
