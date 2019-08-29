@@ -85,38 +85,33 @@ def run_test(function, file_name, level, processes=100, k_fold=5):
     print(max(score), best, level, combination)
 
 
-def classification_with_XGBClassifier(file_name, number, level, return_score=True, k_fold=5, verbose=False):
+def classification_with_XGBClassifier(file_name, number, level, return_score=True, k_fold=5):
     """
     classification with XGBClassifier
-    last modified: 2019-08-29T13:40:37+0900
+    last modified: 2019-08-29T16:09:08+0900
     """
     _pickle_file = "pickles/classification_with_XGBClassifier_" + file_name + "_" + str(number) + "_" + str(level) + "_" + str(k_fold) + ".pkl"
     if os.path.exists(_pickle_file):
         with open(_pickle_file, "rb") as f:
             y_answer, y_predict = pickle.load(f)
     else:
-        folded_data = data.processed_data(file_name=file_name, level=level, for_validation=True, k_fold=k_fold)
+        raw_data = data.processed_data(file_name=file_name, level=level)
 
         selected_features = change_number_to_feature(file_name, number, level)
-        for i, elem in enumerate(folded_data):
-            folded_data[i] = elem[selected_features + ["classification"]]
+        x_data = raw_data[selected_features]
+        y_data = raw_data[["classification"]]
 
         y_answer, y_predict = list(), list()
-        for i in range(k_fold):
-            train_data = pandas.concat(list(map(lambda x: folded_data[i], list(filter(lambda x: x != i, range(k_fold))))))
-            test_data = folded_data[i]
 
-            if verbose:
-                print(train_data)
-                print(test_data)
-
-            x_train, y_train = train_data.drop(columns=["classification"]), train_data["classification"]
-            x_test, y_test = test_data.drop(columns=["classification"]), test_data["classification"]
+        kf = sklearn.model_selection.KFold(n_splits=k_fold, random_state=0)
+        for train_data_index, test_data_index in kf.split(X=x_data, y=y_data):
+            x_train, y_train = x_data.iloc[train_data_index, :], numpy.ravel(y_data.iloc[train_data_index, :].values.tolist(), order="C")
+            x_test, y_test = x_data.iloc[test_data_index, :], numpy.ravel(y_data.iloc[test_data_index, :].values.tolist(), order="C")
 
             model = xgboost.XGBClassifier(n_jobs=1, random_state=0)
             model.fit(x_train, y_train, verbose=False, eval_set=[(x_test, y_test)])
 
-            y_answer.append(y_test)
+            y_answer.append(pandas.Series(y_test))
             y_predict.append(pandas.Series(model.predict(x_test)))
 
         y_answer, y_predict = pandas.concat(y_answer, ignore_index=True), pandas.concat(y_predict, ignore_index=True)
@@ -134,7 +129,7 @@ def classification_with_SVC(file_name, number, level, return_score=True, k_fold=
     """
     classification with SVC of SVM
     reference: https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html#sklearn.svm.SVC
-    last modified:
+    last modified: 2019-08-29T16:09:19+0900
     """
     _pickle_file = "pickles/classification_with_SVC_" + file_name + "_" + str(number) + "_" + str(level) + "_" + str(k_fold) + ".pkl"
     if os.path.exists(_pickle_file):
@@ -177,5 +172,6 @@ def classification_with_SVC(file_name, number, level, return_score=True, k_fold=
 
 
 if __name__ == "__main__":
-    run_test(classification_with_SVC, "1.tsv", 5)
-    run_test(classification_with_SVC, "2.tsv", 5)
+    for file_name in ["1.tsv", "2.tsv"]:
+        for function in [classification_with_XGBClassifier, classification_with_SVC]:
+            run_test(function, file_name, 5)
