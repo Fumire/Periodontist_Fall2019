@@ -111,10 +111,10 @@ def drop_columns(raw_data):
     return raw_data
 
 
-def processed_data(file_name, level=6, for_validation=False, k_fold=5):
+def processed_data(file_name, level=6):
     """
     return proceesed data which is ready to use
-    last modified: 2019-08-29T14:02:53+0900
+    last modified: 2019-08-29T16:08:57+0900
     """
     data = get_data(file_name)
     data = merge_columns(data, level)
@@ -122,16 +122,7 @@ def processed_data(file_name, level=6, for_validation=False, k_fold=5):
     data = formatting_column(data)
     data = drop_columns(data)
 
-    if for_validation:
-        numpy.random.seed(0)
-        mask = numpy.random.rand(len(data))
-
-        return_data = list()
-        for i in range(k_fold):
-            return_data.append(data[numpy.all([(i / k_fold) <= mask, mask < ((i + 1) / k_fold)], axis=0)])
-        return return_data
-    else:
-        return data
+    return data
 
 
 if __name__ == "__main__":
