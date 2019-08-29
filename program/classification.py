@@ -3,6 +3,7 @@ import os
 import pickle
 import pandas
 import numpy
+import sklearn
 import xgboost
 import data
 
@@ -129,6 +130,52 @@ def classification_with_XGBClassifier(file_name, number, level, return_score=Tru
         return y_predict
 
 
+def classification_with_SVC(file_name, number, level, return_score=True, k_fold=5, verbose=False):
+    """
+    classification with SVC of SVM
+    reference: https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html#sklearn.svm.SVC
+    last modified:
+    """
+    _pickle_file = "pickles/classification_with_SVC_" + file_name + "_" + str(number) + "_" + str(level) + "_" + str(k_fold) + ".pkl"
+    if os.path.exists(_pickle_file):
+        with open(_pickle_file, "rb") as f:
+            y_answer, y_predict = pickle.load(f)
+
+        if return_score:
+            return numpy.mean(list(map(lambda x: 1 if x[0] == x[1] else 0, zip(y_answer, y_predict))))
+        else:
+            return y_predict
+    else:
+        raw_data = data.processed_data(file_name=file_name, level=level)
+
+        selected_features = change_number_to_feature(file_name, number, level)
+        x_data = raw_data[selected_features]
+        y_data = raw_data[["classification"]]
+
+        y_answer, y_predict = list(), list()
+
+        kf = sklearn.model_selection.KFold(n_splits=k_fold, random_state=0)
+        for train_data_index, test_data_index in kf.split(X=x_data, y=y_data):
+            x_train, y_train = x_data.iloc[train_data_index, :], numpy.ravel(y_data.iloc[train_data_index, :].values.tolist(), order="C")
+            x_test, y_test = x_data.iloc[test_data_index, :], numpy.ravel(y_data.iloc[test_data_index, :].values.tolist(), order="C")
+
+            clf = sklearn.svm.SVC(random_state=0, gamma="scale")
+            clf.fit(x_train, y_train)
+
+            y_answer.append(pandas.Series(y_test))
+            y_predict.append(pandas.Series(clf.predict(x_test)))
+
+        y_answer, y_predict = pandas.concat(y_answer, ignore_index=True), pandas.concat(y_predict, ignore_index=True)
+
+        with open(_pickle_file, "wb") as f:
+            pickle.dump((y_answer, y_predict), f)
+
+        if return_score:
+            return clf.score(x_test, y_test)
+        else:
+            return y_predict
+
+
 if __name__ == "__main__":
-    run_test(classification_with_XGBClassifier, "1.tsv", 5)
-    run_test(classification_with_XGBClassifier, "2.tsv", 5)
+    run_test(classification_with_SVC, "1.tsv", 5)
+    run_test(classification_with_SVC, "2.tsv", 5)
