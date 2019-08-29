@@ -132,7 +132,7 @@ def classification_with_SVC(file_name, number, level, return_score=True, k_fold=
     """
     classification with SVC of SVM
     reference: https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html#sklearn.svm.SVC
-    last modified: 2019-08-29T16:56:41+0900
+    last modified: 2019-08-29T17:19:26+0900
     """
     _pickle_file = "pickles/classification_with_SVC_" + file_name + "_" + str(number) + "_" + str(level) + "_" + str(k_fold) + ".pkl"
     if os.path.exists(_pickle_file):
@@ -142,7 +142,7 @@ def classification_with_SVC(file_name, number, level, return_score=True, k_fold=
         if return_score:
             return numpy.mean(list(map(lambda x: 1 if x[0] == x[1] else 0, zip(y_answer, y_predict, y_index))))
         else:
-            return y_predict
+            return y_answer, y_predict, y_index
     else:
         raw_data = data.processed_data(file_name=file_name, level=level)
 
