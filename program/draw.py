@@ -167,6 +167,6 @@ def draw_prediction_binary(function, file_name, level, k_fold=5):
 if __name__ == "__main__":
     for file_name in ["1.tsv", "2.tsv"]:
         draw_tsne_with_marker(file_name)
-        for function in [classification.classification_with_SVC, classification.classification_with_XGBClassifier]:
+        for function in [classification.classification_with_SVC, classification.classification_with_XGBClassifier, classification.classification_with_KNeighbors, classification.classification_with_RandomForest]:
             draw_prediction(function, file_name, 5)
             draw_prediction_binary(function, file_name, 5)
