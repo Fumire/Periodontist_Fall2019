@@ -111,16 +111,27 @@ def drop_columns(raw_data):
     return raw_data
 
 
-def processed_data(file_name, level=6):
+def change_grouping(raw_data, group_list=["H", "CPE", "CPM", "CPS"]):
+    """
+    change group name for other classification such as binary classification.
+    last modifided: 2019-09-02T12:21:32+0900
+    """
+    changing = {"H": group_list[0], "CPE": group_list[1], "CPM": group_list[2], "CPS": group_list[3]}
+    raw_data["classification"] = list(map(lambda x: changing[x], raw_data["classification"].tolist()))
+    return raw_data
+
+
+def processed_data(file_name, level=6, group_list=["H", "CPE", "CPM", "CPS"]):
     """
     return proceesed data which is ready to use
-    last modified: 2019-08-29T16:08:57+0900
+    last modified: 2019-09-02T12:21:38+0900
     """
     data = get_data(file_name)
     data = merge_columns(data, level)
     data = make_class_column(data)
     data = formatting_column(data)
     data = drop_columns(data)
+    data = change_grouping(raw_data=data, group_list=group_list)
 
     return data
 
