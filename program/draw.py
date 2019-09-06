@@ -164,9 +164,47 @@ def draw_prediction_binary(function, file_name, level, k_fold=5):
     fig.savefig("figures/" + "PredictionOX" + current_time() + ".png")
 
 
+def draw_binary_prediction(function, file_name, level, group_list, k_fold=5):
+    """
+    binary prediction which is or which is not
+    last modified: 2019-09-06T16:09:40+0900
+    """
+    best, level = classification.run_test(function, file_name, level, group_list=group_list, k_fold=k_fold)
+    y_answer, y_predict, y_index = function(file_name=file_name, number=best, level=level, return_score=False, k_fold=k_fold, group_list=group_list)
+    score = function(file_name=file_name, number=best, level=level, return_score=True, k_fold=k_fold, group_list=group_list)
+    tsne = data.get_tsne(file_name)
+    color = ["r", "b"]
+
+    assert len(set(y_predict.tolist())) == 2
+
+    matplotlib.use("Agg")
+    matplotlib.rcParams.update({"font.size": 30})
+
+    matplotlib.pyplot.figure()
+    for i, prediction in enumerate(list(set(y_predict.tolist()))):
+        index = list(filter(lambda x: list((y_predict == prediction) & (y_predict == y_answer))[x], y_index))
+        matplotlib.pyplot.scatter(tsne.iloc[index, 0], tsne.iloc[index, 1], c=color[i], s=200, marker="o", label=prediction)
+
+        index = list(filter(lambda x: list((y_predict == prediction) & (y_predict != y_answer))[x], y_index))
+        matplotlib.pyplot.scatter(tsne.iloc[index, 0], tsne.iloc[index, 1], c=color[i], s=200, marker="X", label=prediction)
+
+    matplotlib.pyplot.title(function.__name__ + ": %.2f" % score)
+    matplotlib.pyplot.xlabel("Standardized TSNE-1")
+    matplotlib.pyplot.ylabel("Standardized TSNE-2")
+    matplotlib.pyplot.grid(True)
+    matplotlib.pyplot.legend()
+
+    fig = matplotlib.pyplot.gcf()
+    fig.set_size_inches(24, 24)
+    fig.savefig("figures/" + "BinaryPrediction" + current_time() + ".png")
+
+
 if __name__ == "__main__":
     for file_name in ["1.tsv", "2.tsv"]:
         draw_tsne_with_marker(file_name)
         for function in [classification.classification_with_SVC, classification.classification_with_XGBClassifier, classification.classification_with_KNeighbors, classification.classification_with_RandomForest]:
             draw_prediction(function, file_name, 5)
             draw_prediction_binary(function, file_name, 5)
+            draw_binary_prediction(function, file_name, 5, ["H", "Not_H", "Not_H", "Not_H"])
+            draw_binary_prediction(function, file_name, 5, ["Not_S", "Not_S", "Not_S", "S"])
+            draw_binary_prediction(function, file_name, 5, ["H&E", "H&E", "M&S", "M&S"])
