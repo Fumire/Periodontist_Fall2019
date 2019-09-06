@@ -70,16 +70,16 @@ def change_number_to_feature(file_name, number, level=6):
     return list(filter(lambda x: check_list[raw_features.index(x)], raw_features))
 
 
-def run_test(function, file_name, level, processes=100, k_fold=5):
+def run_test(function, file_name, level, processes=100, k_fold=5, group_list=["H", "CPE", "CPM", "CPS"]):
     """
     execute test for given function.
-    last modified: 2019-08-29T16:29:14+0900
+    last modified: 2019-09-06T14:47:29+0900
     """
     features = get_features(file_name, level)
     print(len(features))
 
     with multiprocessing.Pool(processes=processes) as pool:
-        score = pool.starmap(function, [(file_name, i, level, True, k_fold) for i in range(1, 2 ** len(features))])
+        score = pool.starmap(function, [(file_name, i, level, True, k_fold, group_list) for i in range(1, 2 ** len(features))])
     best = int(numpy.argmax(score)) + 1
     combination = sorted(change_number_to_feature(file_name, best, level))
 
@@ -88,17 +88,17 @@ def run_test(function, file_name, level, processes=100, k_fold=5):
     return best, level
 
 
-def classification_with_XGBClassifier(file_name, number, level, return_score=True, k_fold=5):
+def classification_with_XGBClassifier(file_name, number, level, return_score=True, k_fold=5, group_list=["H", "CPE", "CPM", "CPS"]):
     """
     classification with XGBClassifier
-    last modified: 2019-08-29T16:54:18+0900
+    last modified: 2019-09-06T14:32:52+0900
     """
-    _pickle_file = "pickles/classification_with_XGBClassifier_" + file_name + "_" + str(number) + "_" + str(level) + "_" + str(k_fold) + ".pkl"
+    _pickle_file = "pickles/classification_with_XGBClassifier_" + file_name + "_" + str(number) + "_" + str(level) + "_" + str(k_fold) + "_" + "+".join(group_list) + ".pkl"
     if os.path.exists(_pickle_file):
         with open(_pickle_file, "rb") as f:
             y_answer, y_predict, y_index = pickle.load(f)
     else:
-        raw_data = data.processed_data(file_name=file_name, level=level)
+        raw_data = data.processed_data(file_name=file_name, level=level, group_list=group_list)
 
         selected_features = change_number_to_feature(file_name, number, level)
         x_data = raw_data[selected_features]
@@ -129,13 +129,13 @@ def classification_with_XGBClassifier(file_name, number, level, return_score=Tru
         return y_answer, y_predict, y_index
 
 
-def classification_with_SVC(file_name, number, level, return_score=True, k_fold=5, verbose=False):
+def classification_with_SVC(file_name, number, level, return_score=True, k_fold=5, group_list=["H", "CPE", "CPM", "CPS"]):
     """
     classification with SVC of SVM
     reference: https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html#sklearn.svm.SVC
-    last modified: 2019-09-03T17:39:30+0900
+    last modified: 2019-09-06T14:34:22+0900
     """
-    _pickle_file = "pickles/classification_with_SVC_" + file_name + "_" + str(number) + "_" + str(level) + "_" + str(k_fold) + ".pkl"
+    _pickle_file = "pickles/classification_with_SVC_" + file_name + "_" + str(number) + "_" + str(level) + "_" + str(k_fold) + "_" + "+".join(group_list) + ".pkl"
     if os.path.exists(_pickle_file):
         with open(_pickle_file, "rb") as f:
             y_answer, y_predict, y_index = pickle.load(f)
@@ -145,7 +145,7 @@ def classification_with_SVC(file_name, number, level, return_score=True, k_fold=
         else:
             return y_answer, y_predict, y_index
     else:
-        raw_data = data.processed_data(file_name=file_name, level=level)
+        raw_data = data.processed_data(file_name=file_name, level=level, group_list=group_list)
 
         selected_features = change_number_to_feature(file_name, number, level)
         x_data = raw_data[selected_features]
@@ -176,13 +176,13 @@ def classification_with_SVC(file_name, number, level, return_score=True, k_fold=
             return y_answer, y_predict, y_index
 
 
-def classification_with_KNeighbors(file_name, number, level, return_score=True, k_fold=5, verbose=False):
+def classification_with_KNeighbors(file_name, number, level, return_score=True, k_fold=5, group_list=["H", "CPE", "CPM", "CPS"]):
     """
     classification with Nearest Neighbors algorithm
     reference: https://scikit-learn.org/stable/auto_examples/neighbors/plot_classification.html#sphx-glr-auto-examples-neighbors-plot-classification-py
-    last modified: 2019-09-03T17:38:27+0900
+    last modified: 2019-09-06T14:34:42+0900
     """
-    _pickle_file = "pickles/KNeighbors_" + file_name + "_" + str(number) + "_" + str(level) + "_" + str(k_fold) + ".pkl"
+    _pickle_file = "pickles/KNeighbors_" + file_name + "_" + str(number) + "_" + str(level) + "_" + str(k_fold) + "_" + "+".join(group_list) + ".pkl"
     if os.path.exists(_pickle_file):
         with open(_pickle_file, "rb") as f:
             y_answer, y_predict, y_index = pickle.load(f)
@@ -192,7 +192,7 @@ def classification_with_KNeighbors(file_name, number, level, return_score=True, 
         else:
             return y_answer, y_predict, y_index
     else:
-        raw_data = data.processed_data(file_name=file_name, level=level)
+        raw_data = data.processed_data(file_name=file_name, level=level, group_list=group_list)
 
         selected_features = change_number_to_feature(file_name, number, level)
         x_data, y_data = raw_data[selected_features], raw_data[["classification"]]
@@ -221,13 +221,13 @@ def classification_with_KNeighbors(file_name, number, level, return_score=True, 
             return y_answer, y_predict, y_index
 
 
-def classification_with_RandomForest(file_name, number, level, return_score=True, k_fold=5, verbose=False):
+def classification_with_RandomForest(file_name, number, level, return_score=True, k_fold=5, group_list=["H", "CPE", "CPM", "CPS"]):
     """
     classification with RandomForest
     reference: https://scikit-learn.org/stable/modules/ensemble.html#forest
-    last modified: 2019-09-03T17:50:22+0900
+    last modified: 2019-09-06T14:35:18+0900
     """
-    _pickle_file = "pickles/classification_with_RandomForest_" + file_name + "_" + str(number) + "_" + str(level) + str(k_fold) + ".pkl"
+    _pickle_file = "pickles/classification_with_RandomForest_" + file_name + "_" + str(number) + "_" + str(level) + str(k_fold) + "_" + "+".join(group_list) + ".pkl"
     if os.path.exists(_pickle_file):
         with open(_pickle_file, "rb") as f:
             y_answer, y_predict, y_index = pickle.load(f)
@@ -237,7 +237,7 @@ def classification_with_RandomForest(file_name, number, level, return_score=True
         else:
             return y_answer, y_predict, y_index
     else:
-        raw_data = data.processed_data(file_name=file_name, level=level)
+        raw_data = data.processed_data(file_name=file_name, level=level, group_list=group_list)
 
         x_data, y_data = raw_data[change_number_to_feature(file_name, number, level)], raw_data[["classification"]]
 
@@ -269,4 +269,4 @@ def classification_with_RandomForest(file_name, number, level, return_score=True
 if __name__ == "__main__":
     for file_name in ["1.tsv", "2.tsv"]:
         for function in [classification_with_XGBClassifier, classification_with_SVC, classification_with_KNeighbors, classification_with_RandomForest]:
-            best, level = run_test(function, file_name, 5)
+            best, level = run_test(function, file_name, 5, group_list=["H", "Not_H", "Not_H", "Not_H"])
