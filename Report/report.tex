@@ -1,0 +1,98 @@
+% !TeX spellcheck = en_US
+% !TeX encoding = UTF-8
+\documentclass[aps, 10pt, a4paper]{article}
+\usepackage{graphics, graphicx, graphics}
+\usepackage{fancyvrb, enumerate}
+\usepackage{amsmath, amssymb, amscd, amsfonts}
+\usepackage{geometry}
+\usepackage{multirow}
+\usepackage{url}
+\usepackage{tikz}
+\usepackage{listings, listing}
+\usepackage{color}
+\usetikzlibrary{shapes, arrows, calc, positioning}
+\definecolor{codegreen}{rgb}{0, 0.6, 0}
+\definecolor{codegray}{rgb}{0.5, 0.5, 0.5}
+\definecolor{codepurple}{rgb}{0.58, 0, 0.82}
+\definecolor{backcolour}{rgb}{0.95, 0.95, 0.92}
+\lstdefinestyle{mystyle}
+{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    frame=single
+}
+\lstset{style=mystyle}
+\tikzstyle{decision} = [diamond, draw, fill=blue!20, text width=4.5em, text badly centered, node distance=3cm, inner sep=0pt]
+\tikzstyle{block} = [rectangle, draw, fill=blue!20, text width=5em, text centered, rounded corners, minimum height=2em]
+\tikzstyle{line} = [draw, -latex']
+\tikzstyle{cloud} = [draw, ellipse, fill=red!20, node distance=5em, minimum height=2em]
+\tikzset
+{
+    -|-/.style=
+    {
+        to path=
+        {
+            (\tikztostart) -| ($(\tikztostart)!#1!(\tikztotarget)$) |- (\tikztotarget)
+            \tikztonodes
+        }
+    },
+    -|-/.default=0.5,
+    |-|/.style=
+    {
+        to path=
+        {
+            (\tikztostart) |- ($(\tikztostart)!#1!(\tikztotarget)$) -| (\tikztotarget)
+            \tikztonodes
+        }
+    },
+    |-|/.default=0.5,
+}
+\geometry
+{
+    top = 20mm,
+    bottom = 20mm,
+    left = 20mm,
+    right = 20mm
+}
+
+\title{Periodontist}
+\author{Jaewoong Lee}
+\date{\today}
+
+\begin{document}
+    \maketitle
+    \newpage
+    
+    \tableofcontents
+    \listoftables
+    \listoffigures
+    \newpage
+    
+    \section{Introduction} 
+    
+    \section{Materials}
+    
+    \section{Methods}
+    
+    \section{Results}
+    
+    \section{Discussion}
+    
+    \addcontentsline{toc}{section}{References}
+    \bibliographystyle{apalike}
+    \bibliography{reference}
+\end{document}
