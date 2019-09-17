@@ -70,6 +70,20 @@ def change_number_to_feature(file_name, number, level=6):
     return list(filter(lambda x: check_list[raw_features.index(x)], raw_features))
 
 
+def change_feature_to_number(file_name, features, level=6):
+    """
+    change feature to number
+    last modified: 2019-09-17T15:13:43+0900
+    """
+    raw_features = get_features(file_name, level=level)
+    number = 0
+
+    for i, feature in enumerate(features):
+        number += 2 ** raw_features.index(feature)
+
+    return feature
+
+
 def run_test(function, file_name, level, processes=100, k_fold=5, group_list=["H", "CPE", "CPM", "CPS"]):
     """
     execute test for given function.
@@ -266,7 +280,29 @@ def classification_with_RandomForest(file_name, number, level, return_score=True
             return y_answer, y_predict, y_index
 
 
+def scoring_with_best_combination(file_name, function, level=6, k_fold=5, group_list=["H", "CPE", "CPM", "CPS"]):
+    """
+    Find best combination of features
+    last modified: 
+    """
+    _pickle_file = "pickles/best_combination_" + file_name + "_" + function.__name__ + "_" + str(level) + "_" + str(k_fold) + "_" + "+".join(group_list) + ".pkl"
+    if os.path.exists(_pickle_file):
+        with open(_pickle_file, "rb") as f:
+            answer = pickle.load(f)
+    else:
+        best_combination = [list()]
+        raw_features = get_features(file_name, level=level)
+        with multiprocessing.Pool(processes=100) as pool:
+            for _ in raw_features:
+                using_combination = list(map(lambda x: change_feature_to_number(file_name, x, level), [best_combination[-1] + x for x in list(filter(lambda x: x not in best_combination[-1], raw_features))]))
+                score = pool.starmap(function, [(file_name, number, level, True, k_fold, group_list) for number in using_combination])
+                best_combination.append(change_number_to_feature(file_name, using_combination[int(numpy.argmax(score))]))
+                print(best_combination)
+
+
 if __name__ == "__main__":
     for file_name in ["1.tsv", "2.tsv"]:
         for function in [classification_with_XGBClassifier, classification_with_SVC, classification_with_KNeighbors, classification_with_RandomForest]:
+            scoring_with_best_combination(file_name, function)
+            continue
             best, level = run_test(function, file_name, 5, group_list=["H", "Not_H", "Not_H", "Not_H"])
