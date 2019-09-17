@@ -44,12 +44,15 @@ def get_feature_importances(file_name, level=6, percentile=None, top=10):
         raise ValueError
 
 
-def get_features(file_name, level=6):
+def get_features(file_name, level=6, limitation=True):
     """
     get features in order of importances. Remove feature importances is zero.
-    last modified: 2019-08-27T17:13:38+0900
+    last modified: 2019-09-18T00:48:13+0900
     """
-    raw_features = get_feature_importances(file_name, level=level)
+    if limitation:
+        raw_features = get_feature_importances(file_name, level=level)
+    else:
+        raw_features = get_feature_importances(file_name, level=level, percentile=None, top=None)
     raw_features = list(filter(lambda x: x[0], raw_features))
 
     return list(map(lambda x: x[1], raw_features))
@@ -73,7 +76,7 @@ def change_number_to_feature(file_name, number, level=6):
 def change_feature_to_number(file_name, features, level=6):
     """
     change feature to number
-    last modified: 2019-09-17T15:13:43+0900
+    last modified: 2019-09-17T23:54:03+0900
     """
     raw_features = get_features(file_name, level=level)
     number = 0
@@ -81,7 +84,7 @@ def change_feature_to_number(file_name, features, level=6):
     for i, feature in enumerate(features):
         number += 2 ** raw_features.index(feature)
 
-    return feature
+    return number
 
 
 def run_test(function, file_name, level, processes=100, k_fold=5, group_list=["H", "CPE", "CPM", "CPS"]):
@@ -283,26 +286,30 @@ def classification_with_RandomForest(file_name, number, level, return_score=True
 def scoring_with_best_combination(file_name, function, level=6, k_fold=5, group_list=["H", "CPE", "CPM", "CPS"]):
     """
     Find best combination of features
-    last modified: 
+    last modified: 2019-09-18T00:17:30+0900
     """
     _pickle_file = "pickles/best_combination_" + file_name + "_" + function.__name__ + "_" + str(level) + "_" + str(k_fold) + "_" + "+".join(group_list) + ".pkl"
     if os.path.exists(_pickle_file):
         with open(_pickle_file, "rb") as f:
-            answer = pickle.load(f)
+            best_combination = pickle.load(f)
     else:
-        best_combination = [list()]
-        raw_features = get_features(file_name, level=level)
+        best_combination = [(list(), 0)]
+        raw_features = get_features(file_name, level=level, limitation=False)
         with multiprocessing.Pool(processes=100) as pool:
             for _ in raw_features:
-                using_combination = list(map(lambda x: change_feature_to_number(file_name, x, level), [best_combination[-1] + x for x in list(filter(lambda x: x not in best_combination[-1], raw_features))]))
+                using_combination = list(map(lambda x: change_feature_to_number(file_name, x, level), [best_combination[-1][0] + [x] for x in list(filter(lambda x: x not in best_combination[-1][0], raw_features))]))
                 score = pool.starmap(function, [(file_name, number, level, True, k_fold, group_list) for number in using_combination])
-                best_combination.append(change_number_to_feature(file_name, using_combination[int(numpy.argmax(score))]))
-                print(best_combination)
+                best_combination.append(((change_number_to_feature(file_name, using_combination[int(numpy.argmax(score))])), sorted(score)))
+
+        best_combination = best_combination[1:]
+        with open(_pickle_file, "wb") as f:
+            pickle.dump(best_combination, f)
+
+    return best_combination
 
 
 if __name__ == "__main__":
     for file_name in ["1.tsv", "2.tsv"]:
         for function in [classification_with_XGBClassifier, classification_with_SVC, classification_with_KNeighbors, classification_with_RandomForest]:
             scoring_with_best_combination(file_name, function)
-            continue
             best, level = run_test(function, file_name, 5, group_list=["H", "Not_H", "Not_H", "Not_H"])
