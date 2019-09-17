@@ -199,12 +199,33 @@ def draw_binary_prediction(function, file_name, level, group_list, k_fold=5):
     fig.savefig("figures/" + "BinaryPrediction" + current_time() + ".png")
 
 
+def draw_with_best_combination(file_name, function, level=6, k_fold=5, group_list=["H", "CPE", "CPM", "CPS"]):
+    """
+    draw the best combination of features
+    last modified: 
+    """
+    best_combination = classification.scoring_with_best_combination(file_name, function, level, k_fold, group_list)
+    score = list(map(lambda x: x[1], best_combination))
+
+    matplotlib.use("Agg")
+    matplotlib.rcParams.update({"font.size": 30})
+
+    matplotlib.pyplot.figure()
+    matplotlib.pyplot.boxplot(score)
+
+    matplotlib.pyplot.title("Best combination: " + file_name)
+
+    fig = matplotlib.pyplot.gcf()
+    fig.set_size_inches(48, 24)
+    fig.savefig("figures/" + "BestCombination" + current_time() + ".png")
+
+
 if __name__ == "__main__":
     for file_name in ["1.tsv", "2.tsv"]:
         draw_tsne_with_marker(file_name)
         for function in [classification.classification_with_SVC, classification.classification_with_XGBClassifier, classification.classification_with_KNeighbors, classification.classification_with_RandomForest]:
             draw_prediction(function, file_name, 5)
             draw_prediction_binary(function, file_name, 5)
-            draw_binary_prediction(function, file_name, 5, ["H", "Not_H", "Not_H", "Not_H"])
-            draw_binary_prediction(function, file_name, 5, ["Not_S", "Not_S", "Not_S", "S"])
-            draw_binary_prediction(function, file_name, 5, ["H&E", "H&E", "M&S", "M&S"])
+            for grouping in [["H", "Not_H", "Not_H", "Not_H"], ["Not_S", "Not_S", "Not_S", "S"], ["H&E", "H&E", "M&S", "M&S"]]:
+                draw_binary_prediction(function, file_name, 5, grouping)
+                draw_with_best_combination(file_name, function, group_list=grouping)
