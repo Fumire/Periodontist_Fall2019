@@ -41,6 +41,8 @@ def draw_tsne(file_name):
     fig.set_size_inches(24, 24)
     fig.savefig("figures/" + "TSNE" + current_time() + ".png")
 
+    matplotlib.pyplot.close()
+
 
 def draw_tsne_with_marker(file_name):
     """
@@ -67,6 +69,8 @@ def draw_tsne_with_marker(file_name):
     fig = matplotlib.pyplot.gcf()
     fig.set_size_inches(24, 24)
     fig.savefig("figures/" + "MarkerTSNE" + current_time() + ".png")
+
+    matplotlib.pyplot.close()
 
 
 def draw_feature_importances(file_name, level=6):
@@ -103,6 +107,8 @@ def draw_feature_importances(file_name, level=6):
     fig.set_size_inches(32, 18)
     fig.savefig("figures/" + "FeatureImportances" + current_time() + ".png")
 
+    matplotlib.pyplot.close()
+
 
 def draw_prediction(function, file_name, level, k_fold=5):
     """
@@ -131,6 +137,8 @@ def draw_prediction(function, file_name, level, k_fold=5):
     fig = matplotlib.pyplot.gcf()
     fig.set_size_inches(24, 24)
     fig.savefig("figures/" + "Prediction" + current_time() + ".png")
+
+    matplotlib.pyplot.close()
 
 
 def draw_prediction_binary(function, file_name, level, k_fold=5):
@@ -162,6 +170,8 @@ def draw_prediction_binary(function, file_name, level, k_fold=5):
     fig = matplotlib.pyplot.gcf()
     fig.set_size_inches(24, 24)
     fig.savefig("figures/" + "PredictionOX" + current_time() + ".png")
+
+    matplotlib.pyplot.close()
 
 
 def draw_binary_prediction(function, file_name, level, group_list, k_fold=5):
@@ -198,11 +208,13 @@ def draw_binary_prediction(function, file_name, level, group_list, k_fold=5):
     fig.set_size_inches(24, 24)
     fig.savefig("figures/" + "BinaryPrediction" + current_time() + ".png")
 
+    matplotlib.pyplot.close()
+
 
 def draw_with_best_combination(file_name, function, level=6, k_fold=5, group_list=["H", "CPE", "CPM", "CPS"]):
     """
     draw the best combination of features
-    last modified: 
+    last modified: 2019-09-18T00:53:37+0900
     """
     best_combination = classification.scoring_with_best_combination(file_name, function, level, k_fold, group_list)
     score = list(map(lambda x: x[1], best_combination))
@@ -218,6 +230,8 @@ def draw_with_best_combination(file_name, function, level=6, k_fold=5, group_lis
     fig = matplotlib.pyplot.gcf()
     fig.set_size_inches(48, 24)
     fig.savefig("figures/" + "BestCombination" + current_time() + ".png")
+
+    matplotlib.pyplot.close()
 
 
 if __name__ == "__main__":
