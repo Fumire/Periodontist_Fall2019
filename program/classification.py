@@ -9,12 +9,12 @@ import xgboost
 import data
 
 
-def get_feature_importances(file_name, level=6, percentile=None, top=10):
+def get_feature_importances(file_name, level=6, percentile=None, top=None):
     """
     get feature importances
-    last modified: 2019-08-29T14:06:01+0900
+    last modified: 2019-09-18T01:05:24+0900
     """
-    _pickle_file = "pickles/feature_importances_" + file_name + "_" + str(level) + ".pkl"
+    _pickle_file = "pickles/feature_importances_" + file_name + "_" + str(level) + "_" + str(percentile) + "_" + str(top) + ".pkl"
     if os.path.exists(_pickle_file):
         with open(_pickle_file, "rb") as f:
             return_data = pickle.load(f)
@@ -44,10 +44,10 @@ def get_feature_importances(file_name, level=6, percentile=None, top=10):
         raise ValueError
 
 
-def get_features(file_name, level=6, limitation=True):
+def get_features(file_name, level=6, limitation=False):
     """
     get features in order of importances. Remove feature importances is zero.
-    last modified: 2019-09-18T00:48:13+0900
+    last modified: 2019-09-18T01:05:33+0900
     """
     if limitation:
         raw_features = get_feature_importances(file_name, level=level)
@@ -58,12 +58,12 @@ def get_features(file_name, level=6, limitation=True):
     return list(map(lambda x: x[1], raw_features))
 
 
-def change_number_to_feature(file_name, number, level=6):
+def change_number_to_feature(file_name, number, level=6, limitation=True):
     """
     change number to feature
     last modified: 2019-08-27T17:12:07+0900
     """
-    raw_features = get_features(file_name, level=level)
+    raw_features = get_features(file_name, level=level, limitation=limitation)
 
     if number > 2 ** len(raw_features):
         raise ValueError
@@ -73,12 +73,12 @@ def change_number_to_feature(file_name, number, level=6):
     return list(filter(lambda x: check_list[raw_features.index(x)], raw_features))
 
 
-def change_feature_to_number(file_name, features, level=6):
+def change_feature_to_number(file_name, features, level=6, limitation=True):
     """
     change feature to number
     last modified: 2019-09-17T23:54:03+0900
     """
-    raw_features = get_features(file_name, level=level)
+    raw_features = get_features(file_name, level=level, limitation=limitation)
     number = 0
 
     for i, feature in enumerate(features):
@@ -297,7 +297,7 @@ def scoring_with_best_combination(file_name, function, level=6, k_fold=5, group_
         raw_features = get_features(file_name, level=level, limitation=False)
         with multiprocessing.Pool(processes=100) as pool:
             for _ in raw_features:
-                using_combination = list(map(lambda x: change_feature_to_number(file_name, x, level), [best_combination[-1][0] + [x] for x in list(filter(lambda x: x not in best_combination[-1][0], raw_features))]))
+                using_combination = list(map(lambda x: change_feature_to_number(file_name, x, level, False), [best_combination[-1][0] + [x] for x in list(filter(lambda x: x not in best_combination[-1][0], raw_features))]))
                 score = pool.starmap(function, [(file_name, number, level, True, k_fold, group_list) for number in using_combination])
                 best_combination.append(((change_number_to_feature(file_name, using_combination[int(numpy.argmax(score))])), sorted(score)))
 
@@ -312,4 +312,4 @@ if __name__ == "__main__":
     for file_name in ["1.tsv", "2.tsv"]:
         for function in [classification_with_XGBClassifier, classification_with_SVC, classification_with_KNeighbors, classification_with_RandomForest]:
             scoring_with_best_combination(file_name, function)
-            best, level = run_test(function, file_name, 5, group_list=["H", "Not_H", "Not_H", "Not_H"])
+            # best, level = run_test(function, file_name, 5, group_list=["H", "Not_H", "Not_H", "Not_H"])
