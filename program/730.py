@@ -9,8 +9,7 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument("--verbose", help="Verbose output", action="store_true", default=False)
 parser.add_argument("--file_name", help="File name to read data", type=str, default="/BiO/Store/Helixco/Periodontist_Fall2019/data/Periodontitis_input_dataset_from_784samples_and_additional_54samples_20190730.xlsx")
-parser.add_argument("--train_sheet", help="Sheet name to train", type=str, default="730_samples")
-parser.add_argument("--validate_sheet", help="Sheet name to train", type=str, default="46_samples")
+parser.add_argument("--include_ap", help="Include AP / does not", action="store_true", default=False)
 parser.add_argument("--pickle_dir", help="Directory to store pickle data", type=str, default="pickle")
 parser.add_argument("--tsne", help="Whether overwrite TSNE", action="store_false", default=True)
 
@@ -22,23 +21,16 @@ if len(sys.argv) == 1:
 if not os.path.exists(args.file_name) or not os.path.isfile(args.file_name):
     exit("Invalid file: " + args.file)
 
-train_data = pandas.read_excel(args.file_name, sheet_name=args.train_sheet)
-validate_data = pandas.read_excel(args.file_name, sheet_name=args.validate_sheet)
+data = pandas.concat(pandas.read_excel(args.file_name, sheet_name=None), ignore_index=True)
 
-train_data = train_data[["관리번호", "Classification", "AL", "PD", "DNA농도(ng/ul)", "Total bacteria", "Aa", "Pg", "Tf", "Td", "Pi", "Fn", "Pa", "Cr", "Ec", "Aa_relative", "Pg_relative", "Tf_relative", "Td_relative", "Pi_relative", "Fn_relative", "Pa_relative", "Cr_relative", "Ec_relative"]]
-validate_data = validate_data[["관리번호", "Classification", "AL", "PD", "DNA농도(ng/ul)", "Total bacteria", "Aa", "Pg", "Tf", "Td", "Pi", "Fn", "Pa", "Cr", "Ec", "Aa_relative", "Pg_relative", "Tf_relative", "Td_relative", "Pi_relative", "Fn_relative", "Pa_relative", "Cr_relative", "Ec_relative"]]
-
-train_data.rename(columns={"관리번호": "Number", "DNA농도(ng/ul)": "DNA"}, inplace=True)
-validate_data.rename(columns={"관리번호": "Number", "DNA농도(ng/ul)": "DNA"}, inplace=True)
-
-train_data["Classification"] = list(map(lambda x: {"AP": "S", "Healthy": "H", "CP_E": "E", "CP_M": "M", "CP_S": "S"}[x], train_data["Classification"]))
-validate_data["Classification"] = list(map(lambda x: {"AP": "S", "Healthy": "H", "CP_E": "E", "CP_M": "M", "CP_S": "S"}[x], validate_data["Classification"]))
+data = data[["관리번호", "Classification", "AL", "PD", "DNA농도(ng/ul)", "Total bacteria", "Aa", "Pg", "Tf", "Td", "Pi", "Fn", "Pa", "Cr", "Ec", "Aa_relative", "Pg_relative", "Tf_relative", "Td_relative", "Pi_relative", "Fn_relative", "Pa_relative", "Cr_relative", "Ec_relative"]]
+data.rename(columns={"관리번호": "Number", "DNA농도(ng/ul)": "DNA"}, inplace=True)
+data["Classification"] = list(map(lambda x: {"AP": "S", "Healthy": "H", "CP_E": "E", "CP_M": "M", "CP_S": "S"}[x], data["Classification"]))
+data["Classification_number"] = list(map(lambda x: {"H": 0, "E": 1, "M": 2, "S": 3}[x], data["Classification"]))
 
 if args.verbose:
     print("Train data:")
-    print(train_data)
-    print("validate data:")
-    print(validate_data)
+    print(data)
 
 if not os.path.exists(args.pickle_dir):
     if args.verbose:
@@ -52,40 +44,21 @@ elif os.path.isfile(args.pickle_dir):
 else:
     exit("Something went wrong")
 
-train_tsne_pickle = os.path.join(args.pickle_dir, "train_tsne.pkl")
-if os.path.exists(train_tsne_pickle) and args.tsne:
+tsne_pickle = os.path.join(args.pickle_dir, "tsne.pkl")
+if os.path.exists(tsne_pickle) and args.tsne:
     if args.verbose:
-        print("Pickle exists on train TSNE")
+        print("Pickle exists on TSNE")
 
-    with open(train_tsne_pickle, "rb") as f:
-        train_tsne_data = pickle.load(f)
+    with open(tsne_pickle, "rb") as f:
+        tsne_data = pickle.load(f)
 else:
-    if not os.path.exists(train_tsne_pickle):
-        print("There is no pickle file for train TSNE")
+    if not os.path.exists(tsne_pickle):
+        print("There is no pickle file for TSNE")
     elif not args.tsne:
         print("Pickle file will be overwritten")
 
-    tmp_data = train_data[["Total bacteria", "Aa", "Pg", "Tf", "Td", "Pi", "Fn", "Pa", "Cr", "Ec", "Aa_relative", "Pg_relative", "Tf_relative", "Td_relative", "Pi_relative", "Fn_relative", "Pa_relative", "Cr_relative", "Ec_relative"]]
-    train_tsne_data = sklearn.manifold.TSNE(n_components=2, random_state=0).fit_transform(tmp_data)
+    tmp_data = data[["Total bacteria", "Aa", "Pg", "Tf", "Td", "Pi", "Fn", "Pa", "Cr", "Ec", "Aa_relative", "Pg_relative", "Tf_relative", "Td_relative", "Pi_relative", "Fn_relative", "Pa_relative", "Cr_relative", "Ec_relative"]]
+    tsne_data = sklearn.manifold.TSNE(n_components=2, random_state=0).fit_transform(tmp_data)
 
-    with open(train_tsne_pickle, "wb") as f:
-        pickle.dump(train_tsne_data, f)
-
-validate_tsne_pickle = os.path.join(args.pickle_dir, "validate_tsne.pkl")
-if os.path.exists(validate_tsne_pickle) and args.tsne:
-    if args.verbose:
-        print("Pickle exists on validate TSNE")
-
-    with open(validate_tsne_pickle, "rb") as f:
-        validate_tsne_data = pickle.load(f)
-else:
-    if not os.path.exists(train_tsne_pickle):
-        print("There is no pickle file for validate TSNE")
-    elif not args.tsne:
-        print("Pickle file will be overwritten")
-
-    tmp_data = validate_data[["Total bacteria", "Aa", "Pg", "Tf", "Td", "Pi", "Fn", "Pa", "Cr", "Ec", "Aa_relative", "Pg_relative", "Tf_relative", "Td_relative", "Pi_relative", "Fn_relative", "Pa_relative", "Cr_relative", "Ec_relative"]]
-    validate_tsne_data = sklearn.manifold.TSNE(n_components=2, random_state=0).fit_transform(tmp_data)
-
-    with open(validate_tsne_pickle, "wb") as f:
-        pickle.dump(validate_tsne_data, f)
+    with open(tsne_pickle, "wb") as f:
+        pickle.dump(tsne_data, f)
