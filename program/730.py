@@ -31,6 +31,9 @@ validate_data = validate_data[["관리번호", "Classification", "AL", "PD", "DN
 train_data.rename(columns={"관리번호": "Number", "DNA농도(ng/ul)": "DNA"}, inplace=True)
 validate_data.rename(columns={"관리번호": "Number", "DNA농도(ng/ul)": "DNA"}, inplace=True)
 
+train_data["Classification"] = list(map(lambda x: {"AP": "S", "Healthy": "H", "CP_E": "E", "CP_M": "M", "CP_S": "S"}[x], train_data["Classification"]))
+validate_data["Classification"] = list(map(lambda x: {"AP": "S", "Healthy": "H", "CP_E": "E", "CP_M": "M", "CP_S": "S"}[x], validate_data["Classification"]))
+
 if args.verbose:
     print("Train data:")
     print(train_data)
@@ -51,9 +54,17 @@ else:
 
 train_tsne_pickle = os.path.join(args.pickle_dir, "train_tsne.pkl")
 if os.path.exists(train_tsne_pickle) and args.tsne:
+    if args.verbose:
+        print("Pickle exists on train TSNE")
+
     with open(train_tsne_pickle, "rb") as f:
         train_tsne_data = pickle.load(f)
 else:
+    if not os.path.exists(train_tsne_pickle):
+        print("There is no pickle file for train TSNE")
+    elif not args.tsne:
+        print("Pickle file will be overwritten")
+
     tmp_data = train_data[["Total bacteria", "Aa", "Pg", "Tf", "Td", "Pi", "Fn", "Pa", "Cr", "Ec", "Aa_relative", "Pg_relative", "Tf_relative", "Td_relative", "Pi_relative", "Fn_relative", "Pa_relative", "Cr_relative", "Ec_relative"]]
     train_tsne_data = sklearn.manifold.TSNE(n_components=2, random_state=0).fit_transform(tmp_data)
 
@@ -62,9 +73,17 @@ else:
 
 validate_tsne_pickle = os.path.join(args.pickle_dir, "validate_tsne.pkl")
 if os.path.exists(validate_tsne_pickle) and args.tsne:
-    with open(validate_tsne_pickle, "wb") as f:
+    if args.verbose:
+        print("Pickle exists on validate TSNE")
+
+    with open(validate_tsne_pickle, "rb") as f:
         validate_tsne_data = pickle.load(f)
 else:
+    if not os.path.exists(train_tsne_pickle):
+        print("There is no pickle file for validate TSNE")
+    elif not args.tsne:
+        print("Pickle file will be overwritten")
+
     tmp_data = validate_data[["Total bacteria", "Aa", "Pg", "Tf", "Td", "Pi", "Fn", "Pa", "Cr", "Ec", "Aa_relative", "Pg_relative", "Tf_relative", "Td_relative", "Pi_relative", "Fn_relative", "Pa_relative", "Cr_relative", "Ec_relative"]]
     validate_tsne_data = sklearn.manifold.TSNE(n_components=2, random_state=0).fit_transform(tmp_data)
 
