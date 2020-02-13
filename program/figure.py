@@ -9,9 +9,9 @@ import sklearn.manifold
 parser = argparse.ArgumentParser()
 
 parser.add_argument("-v", "--verbose", help="Verbose output", action="store_true", default=False)
-parser.add_argument("-f", "--file_name", help="File name to read data", type=str, default="/BiO/Store/Helixco/Periodontist_Fall2019/data/Periodontitis_input_dataset_from_784samples_and_additional_54samples_20190730.xlsx")
-parser.add_argument("-b", "--bacteria", help="Bacteria to use", action="append", type=str, default=[])
-parser.add_argument("-c", "--classification", help="Classification to use", action="append", type=str, default=[])
+parser.add_argument("-f", "--file_name", help="File name to read data (should be XLSX)", type=str, default="/BiO/Store/Helixco/Periodontist_Fall2019/data/Periodontitis_input_dataset_from_784samples_and_additional_54samples_20190730.xlsx")
+parser.add_argument("-b", "--bacteria", help="Bacteria to use (e.g. Aa)", action="append", type=str, default=[])
+parser.add_argument("-c", "--classification", help="Classification to use (amongst Healthy, CP_E, CP_M & CP_S)", action="append", type=str, default=[])
 parser.add_argument("--include_ap", help="Include AP", action="store_true", default=False)
 parser.add_argument("-p", "--png", help="PNG file name", type=str, default="TSNE.png")
 
@@ -24,6 +24,10 @@ args = parser.parse_args()
 
 if not os.path.exists(args.file_name) or not os.path.isfile(args.file_name):
     exit("Invalid file: " + args.file_name)
+if not args.file_name.endswith(".xlsx"):
+    exit("Invalid file: " + args.file_name)
+if not args.png.endswith(".png"):
+    exit("Invalid file: " + args.png)
 
 data = pandas.concat(pandas.read_excel(args.file_name, sheet_name=["730_samples", "54_samples"]), ignore_index=True)
 
