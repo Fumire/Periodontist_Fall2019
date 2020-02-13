@@ -24,6 +24,10 @@ if not os.path.exists(args.file_name) or not os.path.isfile(args.file_name):
 data = pandas.concat(pandas.read_excel(args.file_name, sheet_name=None), ignore_index=True)
 
 data = data[["관리번호", "Classification", "AL", "PD", "DNA농도(ng/ul)", "Total bacteria", "Aa", "Pg", "Tf", "Td", "Pi", "Fn", "Pa", "Cr", "Ec", "Aa_relative", "Pg_relative", "Tf_relative", "Td_relative", "Pi_relative", "Fn_relative", "Pa_relative", "Cr_relative", "Ec_relative"]]
+
+if not args.include_ap:
+    data = data.loc[~(data["Classification"] == "AP")]
+
 data.rename(columns={"관리번호": "Number", "DNA농도(ng/ul)": "DNA"}, inplace=True)
 data["Classification"] = list(map(lambda x: {"AP": "S", "Healthy": "H", "CP_E": "E", "CP_M": "M", "CP_S": "S"}[x], data["Classification"]))
 data["Classification_number"] = list(map(lambda x: {"H": 0, "E": 1, "M": 2, "S": 3}[x], data["Classification"]))
