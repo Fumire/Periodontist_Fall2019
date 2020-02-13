@@ -1,7 +1,6 @@
 import argparse
 import os
 import pickle
-import sys
 import matplotlib
 import matplotlib.pyplot
 import pandas
@@ -19,15 +18,14 @@ parser.add_argument("--tsne", help="Whether overwrite TSNE", action="store_false
 
 args = parser.parse_args()
 
-if len(sys.argv) == 1:
-    pass
-
 if not os.path.exists(args.file_name) or not os.path.isfile(args.file_name):
     exit("Invalid file: " + args.file)
 
-data = pandas.concat(pandas.read_excel(args.file_name, sheet_name=None), ignore_index=True)
+data = pandas.concat(pandas.read_excel(args.file_name, sheet_name=["730_samples", "54_samples"]), ignore_index=True)
 
-data = data[["관리번호", "Classification", "AL", "PD", "DNA농도(ng/ul)", "Total bacteria", "Aa", "Pg", "Tf", "Td", "Pi", "Fn", "Pa", "Cr", "Ec", "Aa_relative", "Pg_relative", "Tf_relative", "Td_relative", "Pi_relative", "Fn_relative", "Pa_relative", "Cr_relative", "Ec_relative"]]
+absolute_values = ["Aa", "Pg", "Tf", "Td", "Pi", "Fn", "Pa", "Cr", "Ec"]
+relative_values = ["Aa_relative", "Pg_relative", "Tf_relative", "Td_relative", "Pi_relative", "Fn_relative", "Pa_relative", "Cr_relative", "Ec_relative"]
+data = data[["관리번호", "Classification", "AL", "PD", "DNA농도(ng/ul)", "Total bacteria"] + absolute_values + relative_values]
 
 if not args.include_ap:
     data = data.loc[~(data["Classification"] == "AP")]
@@ -80,7 +78,7 @@ else:
     elif not args.tsne:
         print("Pickle file will be overwritten")
 
-    tmp_data = data[["Total bacteria", "Aa", "Pg", "Tf", "Td", "Pi", "Fn", "Pa", "Cr", "Ec", "Aa_relative", "Pg_relative", "Tf_relative", "Td_relative", "Pi_relative", "Fn_relative", "Pa_relative", "Cr_relative", "Ec_relative"]]
+    tmp_data = data[["Total bacteria"] + absolute_values + relative_values]
 
     tsne_data = pandas.DataFrame(sklearn.manifold.TSNE(n_components=2, random_state=0).fit_transform(tmp_data), columns=["TSNE1", "TSNE2"])
     for column in list(tsne_data.columns):
