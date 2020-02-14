@@ -40,8 +40,6 @@ if not args.classification:
     if args.verbose:
         print("Use default Classification")
     args.classification = ["Healthy", "CP_E", "CP_M", "CP_S"]
-if args.include_ap:
-    args.classification += ["AP"]
 
 if args.abs:
     pass
@@ -67,10 +65,13 @@ matplotlib.rcParams.update({"font.size": 30})
 
 matplotlib.pyplot.figure()
 for item in args.classification:
-    selected_data = tsne_data.loc[(data["Classification"] == item)]
-    color = {"Healthy": "g", "CP_E": "b", "CP_M": "r", "CP_S": "k", "AP": "k"}[item]
-    marker = {"Healthy": "$H$", "CP_E": "$E$", "CP_M": "$M$", "CP_S": "$S$", "AP": "$S$"}[item]
-    label = {"Healthy": "Healthy", "CP_E": "Early", "CP_M": "Moderate", "CP_S": "Severe", "AP": "Severe"}[item]
+    if item == "CP_S" and args.include_ap:
+        selected_data = tsne_data.loc[(data["Classification"] == "CP_S") | (data["Classification"] == "AP")]
+    else:
+        selected_data = tsne_data.loc[(data["Classification"] == item)]
+    color = {"Healthy": "g", "CP_E": "b", "CP_M": "r", "CP_S": "k"}[item]
+    marker = {"Healthy": "$H$", "CP_E": "$E$", "CP_M": "$M$", "CP_S": "$S$"}[item]
+    label = {"Healthy": "Healthy", "CP_E": "Early", "CP_M": "Moderate", "CP_S": "Severe"}[item]
     matplotlib.pyplot.scatter(selected_data["TSNE1"], selected_data["TSNE2"], c=color, marker=marker, s=200, label=label)
 
 matplotlib.pyplot.xlabel("TSNE-1")
