@@ -104,5 +104,5 @@ venv.bak/
 .mypy_cache/
 
 # Raw data is classified
-data/*.tsv
-data/*.xlsx
+data/*
+!data/.gitkeep
