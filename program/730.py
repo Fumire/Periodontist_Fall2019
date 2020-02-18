@@ -1,11 +1,15 @@
 import argparse
 import os
 import pickle
+import sys
 import matplotlib
 import matplotlib.pyplot
+import numpy
 import pandas
 import scipy
 import sklearn.manifold
+import sklearn.model_selection
+import sklearn.neural_network
 
 parser = argparse.ArgumentParser()
 
@@ -15,6 +19,13 @@ parser.add_argument("--include_ap", help="Include AP / does not", action="store_
 parser.add_argument("--pickle_dir", help="Directory to store pickle data", type=str, default="pickle")
 parser.add_argument("--png_dir", help="Directory to store PNG data", type=str, default="PNG")
 parser.add_argument("--tsne", help="Whether overwrite TSNE", action="store_false", default=True)
+parser.add_argument("--random_state", help="Random number generator", type=int, default=0)
+parser.add_argument("--MLP", help="Whether overwrite MLP", action="store_false", default=True)
+
+group1 = parser.add_mutually_exclusive_group(required=True)
+group1.add_argument("--absolute", help="Use absolute values only", action="store_true", default=False)
+group1.add_argument("--relative", help="Use relative values only", action="store_true", default=False)
+group1.add_argument("--both", help="Use both", action="store_true", default=False)
 
 args = parser.parse_args()
 
@@ -51,6 +62,10 @@ elif os.path.isfile(args.pickle_dir):
 else:
     exit("Something went wrong")
 
+with open(os.path.join(args.pickle_dir, "command.sh"), "w") as f:
+    f.write("python3 ")
+    f.write(" ".join(sys.argv))
+
 if not os.path.exists(args.png_dir):
     if args.verbose:
         print("Making PNG directory as: ", args.png_dir)
@@ -65,7 +80,6 @@ else:
 
 if args.verbose:
     print("Generating TSNE")
-tsne_data = pandas.DataFrame()
 tsne_pickle = os.path.join(args.pickle_dir, "tsne.csv")
 if os.path.exists(tsne_pickle) and args.tsne:
     if args.verbose:
@@ -112,3 +126,41 @@ fig.savefig(os.path.join(args.png_dir, "TSNE.png"))
 matplotlib.pyplot.close()
 if args.verbose:
     print("Done!!")
+
+using_features = list()
+if args.absolute or args.both:
+    using_features += absolute_values
+if args.relative or args.both:
+    using_features += relative_values
+
+train_test_data, validation_data = sklearn.model_selection.train_test_split(data[["Classification"] + using_features], test_size=0.1, random_state=args.random_state)
+if args.verbose:
+    print(train_test_data)
+    print(validation_data)
+
+
+def num2bacteria(num, bacteria):
+    if num >= 2 ** (len(bacteria) + 1):
+        raise ValueError
+    return list(map(lambda x: x[1], list(filter(lambda x: num & (2 ** x[0]), list(enumerate(bacteria))))))
+
+
+MLP_pickle = os.path.join(args.pickle_dir, "MLP.csv")
+if os.path.isfile(MLP_pickle) and args.MLP:
+    MLP_data = pandas.read_csv(MLP_pickle)
+else:
+    MLP_data = [("Number", "Score")]
+    for i in range(1, 2 ** (len(absolute_values) + 1)):
+        if args.verbose:
+            print("MLPClassifier", i, "/", 2 ** (len(absolute_values) + 1))
+        score = list()
+        for train_index, test_index in sklearn.model_selection.KFold(n_splits=5, shuffle=True, random_state=args.random_state).split(train_test_data):
+            train_data, test_data = train_test_data.iloc[train_index], train_test_data.iloc[test_index]
+
+            MLPClassifier = sklearn.neural_network.MLPClassifier(random_state=args.random_state, max_iter=2 ** 32)
+            MLPClassifier.fit(train_data[using_features], numpy.ravel(train_data[["Classification"]]))
+            score.append(MLPClassifier.score(test_data[using_features], numpy.ravel(test_data[["Classification"]])))
+        MLP_data += [(i, numpy.mean(score))]
+    MLP_data = pandas.DataFrame(MLP_data[1:], columns=MLP_data[0])
+if args.verbose:
+    print(MLP_data)
