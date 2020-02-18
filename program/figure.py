@@ -14,6 +14,7 @@ parser.add_argument("-b", "--bacteria", help="Bacteria to use (e.g. Aa)", action
 parser.add_argument("-c", "--classification", help="Classification to use (amongst Healthy, CP_E, CP_M & CP_S)", action="append", type=str, default=[], choices=["Healthy", "CP_E", "CP_M", "CP_S"])
 parser.add_argument("--include_ap", help="Include AP", action="store_true", default=False)
 parser.add_argument("-p", "--png", help="PNG file name", type=str, default="TSNE.png")
+parser.add_argument("-t", "--title", help="Add title to PNG file", action="store_true", default=False)
 
 group1 = parser.add_mutually_exclusive_group(required=True)
 group1.add_argument("--abs", help="Use absolute values", action="store_true", default=False)
@@ -35,6 +36,7 @@ if not args.bacteria:
     if args.verbose:
         print("Use default Bacteria")
     args.bacteria = ["Aa", "Pg", "Tf", "Td", "Pi", "Fn", "Pa", "Cr", "Ec"]
+args.bacteria.sort()
 
 if not args.classification:
     if args.verbose:
@@ -70,10 +72,12 @@ for item in args.classification:
     else:
         selected_data = tsne_data.loc[(data["Classification"] == item)]
     color = {"Healthy": "g", "CP_E": "b", "CP_M": "r", "CP_S": "k"}[item]
-    marker = {"Healthy": "$H$", "CP_E": "$E$", "CP_M": "$M$", "CP_S": "$S$"}[item]
-    label = {"Healthy": "Healthy", "CP_E": "Early", "CP_M": "Moderate", "CP_S": "Severe"}[item]
+    marker = {"Healthy": "$H$", "CP_E": "$Sli$", "CP_M": "$M$", "CP_S": "$S$"}[item]
+    label = {"Healthy": "Healthy", "CP_E": "Slight", "CP_M": "Moderate", "CP_S": "Severe"}[item]
     matplotlib.pyplot.scatter(selected_data["TSNE1"], selected_data["TSNE2"], c=color, marker=marker, s=200, label=label)
 
+if args.title:
+    matplotlib.pyplot.title("+".join(args.bacteria))
 matplotlib.pyplot.xlabel("TSNE-1")
 matplotlib.pyplot.ylabel("TSNE-2")
 matplotlib.pyplot.grid(True)
