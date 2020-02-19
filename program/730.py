@@ -120,7 +120,7 @@ else:
 
     tmp_data = data[["Total bacteria"] + using_features]
 
-    tsne_data = pandas.DataFrame(sklearn.manifold.TSNE(n_components=2, random_state=0).fit_transform(tmp_data), columns=["TSNE1", "TSNE2"])
+    tsne_data = pandas.DataFrame(sklearn.manifold.TSNE(n_components=2, random_state=0, n_jobs=args.jobs, init="pca").fit_transform(tmp_data), columns=["TSNE1", "TSNE2"])
     for column in list(tsne_data.columns):
         tsne_data[column] = scipy.stats.zscore(tsne_data[column])
     for column in ["Number"]:
