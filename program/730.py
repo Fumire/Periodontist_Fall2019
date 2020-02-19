@@ -8,10 +8,14 @@ import matplotlib.pyplot
 import numpy
 import pandas
 import scipy
+import sklearn.ensemble
+import sklearn.gaussian_process
 import sklearn.manifold
 import sklearn.metrics
 import sklearn.model_selection
+import sklearn.neighbors
 import sklearn.neural_network
+import sklearn.tree
 
 parser = argparse.ArgumentParser()
 
@@ -32,13 +36,15 @@ group1.add_argument("--both", help="Use both absolute and relative values", acti
 
 args = parser.parse_args()
 
-remake_where = {"TSNE": 0, "multi_MLP_classification": 1}
+remake_where = {"TSNE": 0, "four_groups": 1}
 absolute_values = sorted(["Aa", "Pg", "Tf", "Td", "Pi", "Fn", "Pa", "Cr", "Ec"])
 relative_values = sorted(["Aa_relative", "Pg_relative", "Tf_relative", "Td_relative", "Pi_relative", "Fn_relative", "Pa_relative", "Cr_relative", "Ec_relative"])
 classes = ["H", "E", "M", "S"]
 two_class_combinations = itertools.combinations(classes, 2)
 three_class_combinations = itertools.combinations(classes, 3)
 statistics = ("sensitivity", "specificity", "precision", "negative_predictive_value", "miss_rate", "fall_out", "false_discovery_rate", "false ommission_rate", "thread_score", "accuracy", "F1_score")
+
+multiclass_classifier_list = [("MLP", sklearn.neural_network.MLPClassifier(random_state=args.random_state, max_iter=2 ** 30, early_stopping=True)), ("SVC", sklearn.svm.SVC(decision_function_shape="ovr", random_state=args.random_state, probability=True)), ("KNeighbors", sklearn.neighbors.KNeighborsClassifier(n_jobs=1, algorithm="brute")), ("GaussianClassifier", sklearn.gaussian_process.GaussianProcessClassifier(max_iter_predict=2 ** 30, random_state=args.random_state, multi_class="one_vs_rest", n_jobs=1)), ("DecisionTree", sklearn.tree.DecisionTreeClassifier(random_state=args.random_state)), ("RandomForest", sklearn.ensemble.RandomForestClassifier(n_jobs=1, random_state=args.random_state)), ("AdaBoost", sklearn.ensemble.AdaBoostClassifier(random_state=args.random_state))]
 
 using_features = list()
 if args.absolute or args.both:
@@ -147,9 +153,9 @@ matplotlib.pyplot.close()
 if args.verbose:
     print("Done!!")
 
-train_test_data, validation_data = sklearn.model_selection.train_test_split(data[["Classification", "Classification_number"] + using_features], test_size=0.1, random_state=args.random_state)
+train_data, validation_data = sklearn.model_selection.train_test_split(data[["Classification", "Classification_number"] + using_features], test_size=0.1, random_state=args.random_state)
 if args.verbose:
-    print(train_test_data)
+    print(train_data)
     print(validation_data)
 
 
@@ -159,37 +165,39 @@ def num_to_bacteria(num, bacteria):
     return list(map(lambda x: x[1], list(filter(lambda x: num & (2 ** x[0]), list(enumerate(bacteria))))))
 
 
+def bacteria_to_num(selected, everything):
+    for something in selected:
+        if something not in everything:
+            raise ValueError
+    return list(map(lambda x: 2 ** x[0], list(filter(lambda x: x[1] in selected, list(enumerate(everything))))))
+
+
 def aggregate_confusion_matrix(confusion_matrix):
     TP, FP, FN, TN = confusion_matrix[0][0], confusion_matrix[0][1], confusion_matrix[1][0], confusion_matrix[1][1]
-    return TP / (TP + FN), TN / (TN + FP), TP / (TP + FP), TN / (TN + FN), FN / (FN + TP), FP / (FP + TN), FP / (FP + TP), FN / (FN + TN), TP / (TP + FN + FP), (TP + TN) / (TP + TN + FP + FN), 2 * TP / (2 * TP + FP + FN)
+    return (TP / (TP + FN), TN / (TN + FP), TP / (TP + FP), TN / (TN + FN), FN / (FN + TP), FP / (FP + TN), FP / (FP + TP), FN / (FN + TN), TP / (TP + FN + FP), (TP + TN) / (TP + TN + FP + FN), 2 * TP / (2 * TP + FP + FN))
 
 
-def run_all_MLP_classification(num, features):
-    confusion_matrix = numpy.zeros((2, 2), dtype=int)
-    area_under_curve = list()
-    for train_index, test_index in sklearn.model_selection.KFold(n_splits=args.KFold, shuffle=True, random_state=args.random_state).split(train_test_data):
-        train_data, test_data = train_test_data.iloc[train_index], train_test_data.iloc[test_index]
+def run_four_group_classification(num, features, classifier):
+    classifier.fit(train_data[features], numpy.ravel(train_data[["Classification"]]))
 
-        MLPClassifier = sklearn.neural_network.MLPClassifier(random_state=args.random_state, max_iter=2 ** 32)
-        MLPClassifier.fit(train_data[features], numpy.ravel(train_data[["Classification"]]))
-
-        confusion_matrix += numpy.sum(sklearn.metrics.multilabel_confusion_matrix(test_data[["Classification"]], MLPClassifier.predict(test_data[features])), axis=0, dtype=int)
-        area_under_curve.append(sklearn.metrics.roc_auc_score(test_data[["Classification_number"]], MLPClassifier.predict_proba(test_data[features]), multi_class="ovr"))
-
-    area_under_curve = numpy.mean(area_under_curve, dtype=float)
-
-    return (num, area_under_curve) + aggregate_confusion_matrix(confusion_matrix)
+    return (num, sklearn.metrics.roc_auc_score(validation_data[["Classification_number"]], classifier.predict_proba(validation_data[features]), multi_class="ovr")) + aggregate_confusion_matrix(numpy.sum(sklearn.metrics.multilabel_confusion_matrix(validation_data[["Classification"]], classifier.predict(validation_data[features])), axis=0, dtype=int))
 
 
-multi_MLP_classification_pickle = os.path.join(args.pickle_dir, "All_MLP.csv")
-if os.path.isfile(multi_MLP_classification_pickle) and args.remake > remake_where["multi_MLP_classification"]:
-    multi_MLP_classification_data = pandas.read_csv(multi_MLP_classification_pickle)
-else:
-    multi_MLP_classification_data = [("Number", "area_under_curve") + statistics]
-    with multiprocessing.Pool(processes=args.jobs) as pool:
-        multi_MLP_classification_data += sorted(pool.starmap(run_all_MLP_classification, [(i, num_to_bacteria(i, using_features)) for i in range(1, 2 ** len(using_features))]))
+fourgroup_classifier_results = list()
+for classifier_name, classifier in multiclass_classifier_list:
+    if args.verbose:
+        print(classifier_name)
+    csv_file = os.path.join(args.pickle_dir, "FourGroups_" + classifier_name + ".csv")
+    if os.path.isfile(csv_file) and args.remake > remake_where["four_groups"]:
+        classifier_result = pandas.read_csv(csv_file)
+    else:
+        classifier_result = [("Number", "area_under_curve") + statistics]
+        with multiprocessing.Pool(processes=args.jobs) as pool:
+            classifier_result += sorted(pool.starmap(run_four_group_classification, [(i, num_to_bacteria(i, using_features), classifier) for i in range(1, 2 ** len(using_features))]))
 
-    multi_MLP_classification_data = pandas.DataFrame(multi_MLP_classification_data[1:], columns=multi_MLP_classification_data[0])
-    multi_MLP_classification_data.to_csv(multi_MLP_classification_pickle, index=False)
-if args.verbose:
-    print(multi_MLP_classification_data)
+        classifier_result = pandas.DataFrame(classifier_result[1:], columns=classifier_result[0])
+        classifier_result.to_csv(csv_file, index=False)
+
+    if args.verbose:
+        print(classifier_result)
+    fourgroup_classifier_results.append(classifier_result)
