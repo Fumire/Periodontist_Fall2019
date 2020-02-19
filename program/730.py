@@ -18,25 +18,35 @@ parser.add_argument("--file_name", help="File name to read data", type=str, defa
 parser.add_argument("--include_ap", help="Include AP / does not", action="store_true", default=False)
 parser.add_argument("--pickle_dir", help="Directory to store pickle data", type=str, default="pickle")
 parser.add_argument("--png_dir", help="Directory to store PNG data", type=str, default="PNG")
-parser.add_argument("--tsne", help="Whether overwrite TSNE", action="store_false", default=True)
+parser.add_argument("--remake", help="Re-make from where", choices=range(101), default=100)
 parser.add_argument("--random_state", help="Random number generator", type=int, default=0)
-parser.add_argument("--MLP", help="Whether overwrite MLP", action="store_false", default=True)
 
 group1 = parser.add_mutually_exclusive_group(required=True)
 group1.add_argument("--absolute", help="Use absolute values only", action="store_true", default=False)
 group1.add_argument("--relative", help="Use relative values only", action="store_true", default=False)
-group1.add_argument("--both", help="Use both", action="store_true", default=False)
+group1.add_argument("--both", help="Use both absolute and relative values", action="store_true", default=False)
 
 args = parser.parse_args()
+
+remake_where = {"TSNE": 0, "MLP_classification": 1}
+absolute_values = sorted(["Aa", "Pg", "Tf", "Td", "Pi", "Fn", "Pa", "Cr", "Ec"])
+relative_values = sorted(["Aa_relative", "Pg_relative", "Tf_relative", "Td_relative", "Pi_relative", "Fn_relative", "Pa_relative", "Cr_relative", "Ec_relative"])
+
+using_features = list()
+if args.absolute or args.both:
+    using_features += absolute_values
+if args.relative or args.both:
+    using_features += relative_values
+if using_features:
+    using_features.sort()
+else:
+    exit("Something went wrong")
 
 if not os.path.exists(args.file_name) or not os.path.isfile(args.file_name):
     exit("Invalid file: " + args.file)
 
 data = pandas.concat(pandas.read_excel(args.file_name, sheet_name=["730_samples", "54_samples"]), ignore_index=True)
-
-absolute_values = ["Aa", "Pg", "Tf", "Td", "Pi", "Fn", "Pa", "Cr", "Ec"]
-relative_values = ["Aa_relative", "Pg_relative", "Tf_relative", "Td_relative", "Pi_relative", "Fn_relative", "Pa_relative", "Cr_relative", "Ec_relative"]
-data = data[["관리번호", "Classification", "AL", "PD", "DNA농도(ng/ul)", "Total bacteria"] + absolute_values + relative_values]
+data = data[["관리번호", "Classification", "AL", "PD", "DNA농도(ng/ul)", "Total bacteria"] + using_features]
 
 if not args.include_ap:
     data = data.loc[~(data["Classification"] == "AP")]
@@ -53,7 +63,7 @@ if args.verbose:
 if not os.path.exists(args.pickle_dir):
     if args.verbose:
         print("Making pickle directory as:", args.pickle_dir)
-    os.mkdir(args.pickle_dir)
+    os.makedirs(args.pickle_dir)
 elif os.path.isdir(args.pickle_dir):
     if args.verbose:
         print("Pickle directory already exists")
@@ -81,7 +91,7 @@ else:
 if args.verbose:
     print("Generating TSNE")
 tsne_pickle = os.path.join(args.pickle_dir, "tsne.csv")
-if os.path.exists(tsne_pickle) and args.tsne:
+if os.path.exists(tsne_pickle) and args.remake > remake_where["TSNE"]:
     if args.verbose:
         print("Pickle exists on TSNE")
 
@@ -89,10 +99,10 @@ if os.path.exists(tsne_pickle) and args.tsne:
 else:
     if not os.path.exists(tsne_pickle):
         print("There is no pickle file for TSNE")
-    elif not args.tsne:
+    elif args.remake > remake_where["TSNE"]:
         print("Pickle file will be overwritten")
 
-    tmp_data = data[["Total bacteria"] + absolute_values + relative_values]
+    tmp_data = data[["Total bacteria"] + using_features]
 
     tsne_data = pandas.DataFrame(sklearn.manifold.TSNE(n_components=2, random_state=0).fit_transform(tmp_data), columns=["TSNE1", "TSNE2"])
     for column in list(tsne_data.columns):
@@ -127,12 +137,6 @@ matplotlib.pyplot.close()
 if args.verbose:
     print("Done!!")
 
-using_features = list()
-if args.absolute or args.both:
-    using_features += absolute_values
-if args.relative or args.both:
-    using_features += relative_values
-
 train_test_data, validation_data = sklearn.model_selection.train_test_split(data[["Classification"] + using_features], test_size=0.1, random_state=args.random_state)
 if args.verbose:
     print(train_test_data)
@@ -145,22 +149,29 @@ def num2bacteria(num, bacteria):
     return list(map(lambda x: x[1], list(filter(lambda x: num & (2 ** x[0]), list(enumerate(bacteria))))))
 
 
-MLP_pickle = os.path.join(args.pickle_dir, "MLP.csv")
-if os.path.isfile(MLP_pickle) and args.MLP:
-    MLP_data = pandas.read_csv(MLP_pickle)
+MLP_classification_pickle = os.path.join(args.pickle_dir, "MLP.csv")
+if os.path.isfile(MLP_classification_pickle) and args.remake > remake_where["MLP_classification"]:
+    MLP_classification_data = pandas.read_csv(MLP_classification_pickle)
 else:
-    MLP_data = [("Number", "Score")]
-    for i in range(1, 2 ** (len(absolute_values) + 1)):
+    MLP_classification_data = [("Number", "Score")]
+    for i in range(1, 2 ** (len(using_features) + 1)):
         if args.verbose:
             print("MLPClassifier", i, "/", 2 ** (len(absolute_values) + 1))
+
+        tmp_features = num2bacteria(i, using_features)
         score = list()
+
         for train_index, test_index in sklearn.model_selection.KFold(n_splits=5, shuffle=True, random_state=args.random_state).split(train_test_data):
             train_data, test_data = train_test_data.iloc[train_index], train_test_data.iloc[test_index]
 
             MLPClassifier = sklearn.neural_network.MLPClassifier(random_state=args.random_state, max_iter=2 ** 32)
-            MLPClassifier.fit(train_data[using_features], numpy.ravel(train_data[["Classification"]]))
-            score.append(MLPClassifier.score(test_data[using_features], numpy.ravel(test_data[["Classification"]])))
-        MLP_data += [(i, numpy.mean(score))]
-    MLP_data = pandas.DataFrame(MLP_data[1:], columns=MLP_data[0])
+            MLPClassifier.fit(train_data[tmp_features], numpy.ravel(train_data[["Classification"]]))
+            score.append(MLPClassifier.score(test_data[tmp_features], numpy.ravel(test_data[["Classification"]])))
+
+        MLP_classification_data += [(i, numpy.mean(score))]
+        if args.verbose:
+            print(">>>", numpy.mean(score))
+    MLP_classification_data = pandas.DataFrame(MLP_classification_data[1:], columns=MLP_classification_data[0])
+    MLP_classification_data.to_csv(MLP_classification_pickle, index=False)
 if args.verbose:
-    print(MLP_data)
+    print(MLP_classification_data)
