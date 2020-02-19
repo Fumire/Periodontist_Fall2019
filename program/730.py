@@ -1,4 +1,5 @@
 import argparse
+import multiprocessing
 import os
 import pickle
 import sys
@@ -20,6 +21,7 @@ parser.add_argument("--pickle_dir", help="Directory to store pickle data", type=
 parser.add_argument("--png_dir", help="Directory to store PNG data", type=str, default="PNG")
 parser.add_argument("--remake", help="Re-make from where", choices=range(101), default=100)
 parser.add_argument("--random_state", help="Random number generator", type=int, default=0)
+parser.add_argument("--jobs", help="Number of threads to use", type=int, default=50)
 
 group1 = parser.add_mutually_exclusive_group(required=True)
 group1.add_argument("--absolute", help="Use absolute values only", action="store_true", default=False)
@@ -149,28 +151,28 @@ def num2bacteria(num, bacteria):
     return list(map(lambda x: x[1], list(filter(lambda x: num & (2 ** x[0]), list(enumerate(bacteria))))))
 
 
+def run_MLP_classification(num, features):
+    score = list()
+    for train_index, test_index in sklearn.model_selection.KFold(n_splits=5, shuffle=True, random_state=args.random_state).split(train_test_data):
+        train_data, test_data = train_test_data.iloc[train_index], train_test_data.iloc[test_index]
+
+        MLPClassifier = sklearn.neural_network.MLPClassifier(random_state=args.random_state, max_iter=2 ** 32)
+        MLPClassifier.fit(train_data[features], numpy.ravel(train_data[["Classification"]]))
+        score.append(MLPClassifier.score(test_data[features], numpy.ravel(test_data[["Classification"]])))
+    score = numpy.mean(score)
+    if args.verbose:
+        print(">>>", num, score)
+    return num, score
+
+
 MLP_classification_pickle = os.path.join(args.pickle_dir, "MLP.csv")
 if os.path.isfile(MLP_classification_pickle) and args.remake > remake_where["MLP_classification"]:
     MLP_classification_data = pandas.read_csv(MLP_classification_pickle)
 else:
     MLP_classification_data = [("Number", "Score")]
-    for i in range(1, 2 ** (len(using_features) + 1)):
-        if args.verbose:
-            print("MLPClassifier", i, "/", 2 ** (len(absolute_values) + 1))
+    with multiprocessing.Pool(processes=args.jobs) as pool:
+        MLP_classification_data += sorted(pool.starmap(run_MLP_classification, [(i, num2bacteria(i, using_features)) for i in range(1, 2 ** (len(absolute_values) + 1))]))
 
-        tmp_features = num2bacteria(i, using_features)
-        score = list()
-
-        for train_index, test_index in sklearn.model_selection.KFold(n_splits=5, shuffle=True, random_state=args.random_state).split(train_test_data):
-            train_data, test_data = train_test_data.iloc[train_index], train_test_data.iloc[test_index]
-
-            MLPClassifier = sklearn.neural_network.MLPClassifier(random_state=args.random_state, max_iter=2 ** 32)
-            MLPClassifier.fit(train_data[tmp_features], numpy.ravel(train_data[["Classification"]]))
-            score.append(MLPClassifier.score(test_data[tmp_features], numpy.ravel(test_data[["Classification"]])))
-
-        MLP_classification_data += [(i, numpy.mean(score))]
-        if args.verbose:
-            print(">>>", numpy.mean(score))
     MLP_classification_data = pandas.DataFrame(MLP_classification_data[1:], columns=MLP_classification_data[0])
     MLP_classification_data.to_csv(MLP_classification_pickle, index=False)
 if args.verbose:
