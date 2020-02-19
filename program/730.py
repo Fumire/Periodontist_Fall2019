@@ -1,7 +1,7 @@
 import argparse
+import itertools
 import multiprocessing
 import os
-import pickle
 import sys
 import matplotlib
 import matplotlib.pyplot
@@ -9,6 +9,7 @@ import numpy
 import pandas
 import scipy
 import sklearn.manifold
+import sklearn.metrics
 import sklearn.model_selection
 import sklearn.neural_network
 
@@ -17,10 +18,11 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--verbose", help="Verbose output", action="store_true", default=False)
 parser.add_argument("--file_name", help="File name to read data", type=str, default="/BiO/Store/Helixco/Periodontist_Fall2019/data/Periodontitis_input_dataset_from_784samples_and_additional_54samples_20190730.xlsx")
 parser.add_argument("--include_ap", help="Include AP / does not", action="store_true", default=False)
-parser.add_argument("--pickle_dir", help="Directory to store pickle data", type=str, default="pickle")
+parser.add_argument("--pickle_dir", help="Directory to store pickle data", type=str, default="results")
 parser.add_argument("--png_dir", help="Directory to store PNG data", type=str, default="PNG")
 parser.add_argument("--remake", help="Re-make from where", choices=range(101), default=100)
 parser.add_argument("--random_state", help="Random number generator", type=int, default=0)
+parser.add_argument("--KFold", help="Split number for KFold", type=int, default=5)
 parser.add_argument("--jobs", help="Number of threads to use", type=int, default=50)
 
 group1 = parser.add_mutually_exclusive_group(required=True)
@@ -30,9 +32,13 @@ group1.add_argument("--both", help="Use both absolute and relative values", acti
 
 args = parser.parse_args()
 
-remake_where = {"TSNE": 0, "MLP_classification": 1}
+remake_where = {"TSNE": 0, "multi_MLP_classification": 1}
 absolute_values = sorted(["Aa", "Pg", "Tf", "Td", "Pi", "Fn", "Pa", "Cr", "Ec"])
 relative_values = sorted(["Aa_relative", "Pg_relative", "Tf_relative", "Td_relative", "Pi_relative", "Fn_relative", "Pa_relative", "Cr_relative", "Ec_relative"])
+classes = ["H", "E", "M", "S"]
+two_class_combinations = itertools.combinations(classes, 2)
+three_class_combinations = itertools.combinations(classes, 3)
+statistics = ("sensitivity", "specificity", "precision", "negative_predictive_value", "miss_rate", "fall_out", "false_discovery_rate", "false ommission_rate", "thread_score", "accuracy", "F1_score")
 
 using_features = list()
 if args.absolute or args.both:
@@ -78,10 +84,11 @@ with open(os.path.join(args.pickle_dir, "command.sh"), "w") as f:
     f.write("python3 ")
     f.write(" ".join(sys.argv))
 
+args.png_dir = os.path.join(args.pickle_dir, args.png_dir)
 if not os.path.exists(args.png_dir):
     if args.verbose:
-        print("Making PNG directory as: ", args.png_dir)
-    os.mkdir(args.png_dir)
+        print("Making PNG directory as:", args.png_dir)
+    os.makedirs(args.png_dir)
 elif os.path.isdir(args.png_dir):
     if args.verbose:
         print("PNG directory already exists")
@@ -100,7 +107,8 @@ if os.path.exists(tsne_pickle) and args.remake > remake_where["TSNE"]:
     tsne_data = pandas.read_csv(tsne_pickle)
 else:
     if not os.path.exists(tsne_pickle):
-        print("There is no pickle file for TSNE")
+        if args.verbose:
+            print("There is no pickle file for TSNE")
     elif args.remake > remake_where["TSNE"]:
         print("Pickle file will be overwritten")
 
@@ -139,41 +147,49 @@ matplotlib.pyplot.close()
 if args.verbose:
     print("Done!!")
 
-train_test_data, validation_data = sklearn.model_selection.train_test_split(data[["Classification"] + using_features], test_size=0.1, random_state=args.random_state)
+train_test_data, validation_data = sklearn.model_selection.train_test_split(data[["Classification", "Classification_number"] + using_features], test_size=0.1, random_state=args.random_state)
 if args.verbose:
     print(train_test_data)
     print(validation_data)
 
 
-def num2bacteria(num, bacteria):
-    if num >= 2 ** (len(bacteria) + 1):
-        raise ValueError
+def num_to_bacteria(num, bacteria):
+    if num >= 2 ** len(bacteria):
+        raise IndexError
     return list(map(lambda x: x[1], list(filter(lambda x: num & (2 ** x[0]), list(enumerate(bacteria))))))
 
 
-def run_MLP_classification(num, features):
-    score = list()
-    for train_index, test_index in sklearn.model_selection.KFold(n_splits=5, shuffle=True, random_state=args.random_state).split(train_test_data):
+def aggregate_confusion_matrix(confusion_matrix):
+    TP, FP, FN, TN = confusion_matrix[0][0], confusion_matrix[0][1], confusion_matrix[1][0], confusion_matrix[1][1]
+    return TP / (TP + FN), TN / (TN + FP), TP / (TP + FP), TN / (TN + FN), FN / (FN + TP), FP / (FP + TN), FP / (FP + TP), FN / (FN + TN), TP / (TP + FN + FP), (TP + TN) / (TP + TN + FP + FN), 2 * TP / (2 * TP + FP + FN)
+
+
+def run_all_MLP_classification(num, features):
+    confusion_matrix = numpy.zeros((2, 2), dtype=int)
+    area_under_curve = list()
+    for train_index, test_index in sklearn.model_selection.KFold(n_splits=args.KFold, shuffle=True, random_state=args.random_state).split(train_test_data):
         train_data, test_data = train_test_data.iloc[train_index], train_test_data.iloc[test_index]
 
         MLPClassifier = sklearn.neural_network.MLPClassifier(random_state=args.random_state, max_iter=2 ** 32)
         MLPClassifier.fit(train_data[features], numpy.ravel(train_data[["Classification"]]))
-        score.append(MLPClassifier.score(test_data[features], numpy.ravel(test_data[["Classification"]])))
-    score = numpy.mean(score)
-    if args.verbose:
-        print(">>>", num, score)
-    return num, score
+
+        confusion_matrix += numpy.sum(sklearn.metrics.multilabel_confusion_matrix(test_data[["Classification"]], MLPClassifier.predict(test_data[features])), axis=0, dtype=int)
+        area_under_curve.append(sklearn.metrics.roc_auc_score(test_data[["Classification_number"]], MLPClassifier.predict_proba(test_data[features]), multi_class="ovr"))
+
+    area_under_curve = numpy.mean(area_under_curve, dtype=float)
+
+    return (num, area_under_curve) + aggregate_confusion_matrix(confusion_matrix)
 
 
-MLP_classification_pickle = os.path.join(args.pickle_dir, "MLP.csv")
-if os.path.isfile(MLP_classification_pickle) and args.remake > remake_where["MLP_classification"]:
-    MLP_classification_data = pandas.read_csv(MLP_classification_pickle)
+multi_MLP_classification_pickle = os.path.join(args.pickle_dir, "All_MLP.csv")
+if os.path.isfile(multi_MLP_classification_pickle) and args.remake > remake_where["multi_MLP_classification"]:
+    multi_MLP_classification_data = pandas.read_csv(multi_MLP_classification_pickle)
 else:
-    MLP_classification_data = [("Number", "Score")]
+    multi_MLP_classification_data = [("Number", "area_under_curve") + statistics]
     with multiprocessing.Pool(processes=args.jobs) as pool:
-        MLP_classification_data += sorted(pool.starmap(run_MLP_classification, [(i, num2bacteria(i, using_features)) for i in range(1, 2 ** (len(absolute_values) + 1))]))
+        multi_MLP_classification_data += sorted(pool.starmap(run_all_MLP_classification, [(i, num_to_bacteria(i, using_features)) for i in range(1, 2 ** len(using_features))]))
 
-    MLP_classification_data = pandas.DataFrame(MLP_classification_data[1:], columns=MLP_classification_data[0])
-    MLP_classification_data.to_csv(MLP_classification_pickle, index=False)
+    multi_MLP_classification_data = pandas.DataFrame(multi_MLP_classification_data[1:], columns=multi_MLP_classification_data[0])
+    multi_MLP_classification_data.to_csv(multi_MLP_classification_pickle, index=False)
 if args.verbose:
-    print(MLP_classification_data)
+    print(multi_MLP_classification_data)
