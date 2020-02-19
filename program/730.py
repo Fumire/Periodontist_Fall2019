@@ -42,7 +42,7 @@ relative_values = sorted(["Aa_relative", "Pg_relative", "Tf_relative", "Td_relat
 classes = ["H", "E", "M", "S"]
 two_class_combinations = itertools.combinations(classes, 2)
 three_class_combinations = itertools.combinations(classes, 3)
-statistics = ("sensitivity", "specificity", "precision", "negative_predictive_value", "miss_rate", "fall_out", "false_discovery_rate", "false ommission_rate", "thread_score", "accuracy", "F1_score")
+statistics = ("sensitivity", "specificity", "precision", "negative_predictive_value", "miss_rate", "fall_out", "false_discovery_rate", "false_ommission_rate", "thread_score", "accuracy", "F1_score", "odds_ratio")
 
 multiclass_classifier_list = [("MLP", sklearn.neural_network.MLPClassifier(random_state=args.random_state, max_iter=2 ** 30, early_stopping=True)), ("SVC", sklearn.svm.SVC(decision_function_shape="ovr", random_state=args.random_state, probability=True)), ("KNeighbors", sklearn.neighbors.KNeighborsClassifier(n_jobs=1, algorithm="brute")), ("GaussianClassifier", sklearn.gaussian_process.GaussianProcessClassifier(max_iter_predict=2 ** 30, random_state=args.random_state, multi_class="one_vs_rest", n_jobs=1)), ("DecisionTree", sklearn.tree.DecisionTreeClassifier(random_state=args.random_state)), ("RandomForest", sklearn.ensemble.RandomForestClassifier(n_jobs=1, random_state=args.random_state)), ("AdaBoost", sklearn.ensemble.AdaBoostClassifier(random_state=args.random_state))]
 
@@ -165,22 +165,17 @@ def num_to_bacteria(num, bacteria):
     return list(map(lambda x: x[1], list(filter(lambda x: num & (2 ** x[0]), list(enumerate(bacteria))))))
 
 
-def bacteria_to_num(selected, everything):
-    for something in selected:
-        if something not in everything:
-            raise ValueError
-    return list(map(lambda x: 2 ** x[0], list(filter(lambda x: x[1] in selected, list(enumerate(everything))))))
-
-
 def aggregate_confusion_matrix(confusion_matrix):
     TP, FP, FN, TN = confusion_matrix[0][0], confusion_matrix[0][1], confusion_matrix[1][0], confusion_matrix[1][1]
-    return (TP / (TP + FN), TN / (TN + FP), TP / (TP + FP), TN / (TN + FN), FN / (FN + TP), FP / (FP + TN), FP / (FP + TP), FN / (FN + TN), TP / (TP + FN + FP), (TP + TN) / (TP + TN + FP + FN), 2 * TP / (2 * TP + FP + FN))
+    return (TP / (TP + FN), TN / (TN + FP), TP / (TP + FP), TN / (TN + FN), FN / (FN + TP), FP / (FP + TN), FP / (FP + TP), FN / (FN + TN), TP / (TP + FN + FP), (TP + TN) / (TP + TN + FP + FN), 2 * TP / (2 * TP + FP + FN), (TP / FP) / (FN / TN))
 
 
 def run_four_group_classification(num, features, classifier):
     classifier.fit(train_data[features], numpy.ravel(train_data[["Classification"]]))
 
-    return (num, sklearn.metrics.roc_auc_score(validation_data[["Classification_number"]], classifier.predict_proba(validation_data[features]), multi_class="ovr")) + aggregate_confusion_matrix(numpy.sum(sklearn.metrics.multilabel_confusion_matrix(validation_data[["Classification"]], classifier.predict(validation_data[features])), axis=0, dtype=int))
+    prediction = classifier.predict(validation_data[features])
+
+    return (num, sklearn.metrics.roc_auc_score(validation_data[["Classification_number"]], classifier.predict_proba(validation_data[features]), multi_class="ovr"), sklearn.metrics.balanced_accuracy_score(validation_data[["Classification"]], prediction)) + aggregate_confusion_matrix(numpy.sum(sklearn.metrics.multilabel_confusion_matrix(validation_data[["Classification"]], prediction), axis=0, dtype=int))
 
 
 fourgroup_classifier_results = list()
@@ -191,7 +186,7 @@ for classifier_name, classifier in multiclass_classifier_list:
     if os.path.isfile(csv_file) and args.remake > remake_where["four_groups"]:
         classifier_result = pandas.read_csv(csv_file)
     else:
-        classifier_result = [("Number", "area_under_curve") + statistics]
+        classifier_result = [("Number", "area_under_curve", "balanced_acuuracy") + statistics]
         with multiprocessing.Pool(processes=args.jobs) as pool:
             classifier_result += sorted(pool.starmap(run_four_group_classification, [(i, num_to_bacteria(i, using_features), classifier) for i in range(1, 2 ** len(using_features))]))
 
