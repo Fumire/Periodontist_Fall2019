@@ -56,7 +56,7 @@ data = data[args.bacteria]
 seaborn.set(context="poster", style="whitegrid")
 
 fig, ax = matplotlib.pyplot.subplots(figsize=(24, 24))
-seaborn.heatmap(data.corr(method=args.method), robust=True, fmt=".2f", square=True)
+seaborn.heatmap(data.corr(method=args.method), robust=True, fmt=".2f", square=True, annot=True)
 
 if args.title:
     ax.set_title("+".join(sorted(args.bacteria)))
