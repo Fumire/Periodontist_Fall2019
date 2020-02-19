@@ -12,7 +12,7 @@ parser.add_argument("-f", "--file_name", help="File name to read data (should be
 parser.add_argument("-b", "--bacteria", help="Bacteria to use (e.g. Aa)", action="append", type=str, default=[], choices=sorted(["Aa", "Pg", "Tf", "Td", "Pi", "Fn", "Pa", "Cr", "Ec"]))
 parser.add_argument("-c", "--classification", help="Classification to use (amongst Healthy, CP_E, CP_M & CP_S)", action="append", type=str, default=[], choices=["Healthy", "CP_E", "CP_M", "CP_S"])
 parser.add_argument("--include_ap", help="Include AP", action="store_true", default=False)
-parser.add_argument("-p", "--png", help="PNG file name", type=str, default="Corr.png")
+parser.add_argument("-p", "--png", help="PNG file name", type=str, default="corr.png")
 parser.add_argument("-t", "--title", help="Add title to PNG file", action="store_true", default=False)
 parser.add_argument("-m", "--method", help="Method to calculate correlation", choices=["pearson", "kendall", "spearman"], default="pearson")
 
@@ -41,6 +41,9 @@ if not args.classification:
     if args.verbose:
         print("Use default Classification")
     args.classification = ["Healthy", "CP_E", "CP_M", "CP_S"]
+
+if not args.include_ap:
+    data = data.loc[~(data["Classification"] == "AP")]
 
 if args.abs:
     pass
