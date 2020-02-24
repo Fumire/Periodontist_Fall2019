@@ -1,10 +1,7 @@
 import argparse
 import os
 import multiprocessing
-import matplotlib
-import matplotlib.pyplot
 import numpy
-import seaborn
 import sklearn.ensemble
 import sklearn.gaussian_process
 import sklearn.metrics
@@ -16,7 +13,7 @@ import sklearn.tree
 import pandas
 import general
 
-classifiers = [("KNeighbors", sklearn.neighbors.KNeighborsClassifier(algorithm="brute", n_jobs=1)), ("SVC", sklearn.svm.SVC(probability=True, decision_function_shape="ovr", random_state=0)), ("Gaussian", sklearn.gaussian_process.GaussianProcessClassifier(max_iter_predict=2 ** 30, random_state=0, multi_class="one_vs_rest", n_jobs=1)), ("DecisionTree", sklearn.tree.DecisionTreeClassifier(random_state=0)), ("RandomeForest", sklearn.ensemble.RandomForestClassifier(random_state=0, n_jobs=1, class_weight="balanced")), ("NeuralNetwork", sklearn.neural_network.MLPClassifier(max_iter=2 ** 30, random_state=0, early_stopping=True)), ("AdaBoost", sklearn.ensemble.AdaBoostClassifier(random_state=0))]
+classifiers = [("KNeighbors", sklearn.neighbors.KNeighborsClassifier(algorithm="brute", n_jobs=1)), ("SVC", sklearn.svm.SVC(probability=True, decision_function_shape="ovr", random_state=0)), ("Gaussian", sklearn.gaussian_process.GaussianProcessClassifier(max_iter_predict=1000, random_state=0, multi_class="one_vs_rest", n_jobs=1)), ("DecisionTree", sklearn.tree.DecisionTreeClassifier(random_state=0)), ("RandomForest", sklearn.ensemble.RandomForestClassifier(random_state=0, n_jobs=1, class_weight="balanced")), ("NeuralNetwork", sklearn.neural_network.MLPClassifier(max_iter=1000, random_state=0, early_stopping=True)), ("AdaBoost", sklearn.ensemble.AdaBoostClassifier(random_state=0))]
 
 
 def actual_five_class_classifier(classifier, train_data, test_data, output_dir, bacteria_num):
@@ -52,21 +49,12 @@ def headquarter_five_class_classifier(jobs=30, input_file=None, output_dir=None)
             results += pool.starmap(actual_five_class_classifier, [(classifier, train_data.copy(), test_data.copy(), os.path.join(output_dir, name), i) for i in range(1, 2 ** len(general.absolute_values))])
             results += pool.starmap(actual_five_class_classifier, [(classifier, train_data.copy(), test_data.copy(), os.path.join(output_dir, name), i * (2 ** len(general.absolute_values))) for i in range(1, 2 ** len(general.relative_values))])
 
-            pandas.DataFrame(results[1:], columns=results[0]).to_csv(general.check_exist(os.path.join(output_dir, name, "statistics.csv")), index=False)
+            results = pandas.DataFrame(results[1:], columns=results[0])
+            results["classifier"] = name
+            results["combined_class"] = None
+            results.to_csv(general.check_exist(os.path.join(output_dir, name, "statistics.csv")), index=False)
 
-            data = pandas.read_csv(os.path.join(output_dir, name, "statistics.csv"))
-            data["Bacteria_Num"] = list(map(lambda x: len(general.num_to_bacteria(x)), data["Number"]))
-
-            for value in ("balanced_accuracy_score", ) + general.aggregate_confusion_matrix(None):
-                seaborn.set(context="poster", style="whitegrid")
-
-                fig, ax = matplotlib.pyplot.subplots(figsize=(24, 24))
-                seaborn.lineplot(x="Bacteria_Num", y=value, data=data, ax=ax)
-
-                ax.set_title("5-class with " + name)
-
-                fig.savefig(general.check_exist(os.path.join(output_dir, name, value + ".png")))
-                matplotlib.pyplot.close(fig)
+    pandas.concat([pandas.read_csv(os.path.join(output_dir, name, "statistics.csv")) for name, classifier in classifiers], ignore_index=True).to_csv(general.check_exist(os.path.join(output_dir, "statistics.csv")), index=False)
 
 
 def actual_four_class_classifier(classifier, train_data, test_data, output_dir, bacteria_num):
@@ -90,6 +78,7 @@ def headquarter_four_class_classifier(jobs=30, input_file=None, output_dir=None)
 
     data = pandas.read_csv(input_file)
     data = data[["Classification"] + general.whole_values]
+    result_data = list()
 
     for one_class, two_class in general.two_class_combinations:
         class_column = list(map(lambda x: one_class + "+" + two_class if x in [one_class, two_class] else x, list(data["Classification"])))
@@ -102,21 +91,14 @@ def headquarter_four_class_classifier(jobs=30, input_file=None, output_dir=None)
                 results += pool.starmap(actual_four_class_classifier, [(classifier, train_data.copy(), test_data.copy(), os.path.join(output_dir, name), i) for i in range(1, 2 ** len(general.absolute_values))])
                 results += pool.starmap(actual_four_class_classifier, [(classifier, train_data.copy(), test_data.copy(), os.path.join(output_dir, name), i * (2 ** len(general.absolute_values))) for i in range(1, 2 ** len(general.relative_values))])
 
-                pandas.DataFrame(results[1:], columns=results[0]).to_csv(general.check_exist(os.path.join(output_dir, name, one_class + "-" + two_class + ".csv")), index=False)
+                results = pandas.DataFrame(results[1:], columns=results[0])
+                results["classifier"] = name
+                results["combined_class"] = one_class + "-" + two_class
+                results.to_csv(general.check_exist(os.path.join(output_dir, name, one_class + "-" + two_class + ".csv")), index=False)
 
-                figure_data = pandas.read_csv(os.path.join(output_dir, name, one_class + "-" + two_class + ".csv"))
-                figure_data["Bacteria_Num"] = list(map(lambda x: len(general.num_to_bacteria(x)), figure_data["Number"]))
+                result_data.append(results.copy())
 
-                for value in ("balanced_accuracy_score", ) + general.aggregate_confusion_matrix(None):
-                    seaborn.set(context="poster", style="whitegrid")
-
-                    fig, ax = matplotlib.pyplot.subplots(figsize=(24, 24))
-                    seaborn.lineplot(x="Bacteria_Num", y=value, data=figure_data, ax=ax)
-
-                    ax.set_title("4-class (%s+%s) with " % (one_class, two_class) + name)
-
-                    fig.savefig(general.check_exist(os.path.join(output_dir, name, one_class + "-" + two_class + "-" + value + ".png")))
-                    matplotlib.pyplot.close(fig)
+    pandas.concat(result_data, ignore_index=True).to_csv(general.check_exist(os.path.join(output_dir, "statistics.csv")), index=False)
 
 
 def actual_three_class_classifier(classifier, train_data, test_data, output_dir, bacteria_num):
@@ -140,6 +122,7 @@ def headquarter_three_class_classifier(jobs=30, input_file=None, output_dir=None
 
     data = pandas.read_csv(input_file)
     data = data[["Classification"] + general.whole_values]
+    result_data = list()
 
     for selected_class in general.three_class_combinations:
         class_column = list(map(lambda x: "+".join(selected_class) if x in selected_class else x, list(data["Classification"])))
@@ -152,21 +135,13 @@ def headquarter_three_class_classifier(jobs=30, input_file=None, output_dir=None
                 results += pool.starmap(actual_four_class_classifier, [(classifier, train_data.copy(), test_data.copy(), os.path.join(output_dir, name), i) for i in range(1, 2 ** len(general.absolute_values))])
                 results += pool.starmap(actual_four_class_classifier, [(classifier, train_data.copy(), test_data.copy(), os.path.join(output_dir, name), i * (2 ** len(general.absolute_values))) for i in range(1, 2 ** len(general.relative_values))])
 
-                pandas.DataFrame(results[1:], columns=results[0]).to_csv(general.check_exist(os.path.join(output_dir, name, "-".join(selected_class) + ".csv")), index=False)
+                results = pandas.DataFrame(results[1:], columns=results[0])
+                results["classifier"] = name
+                results["combined_class"] = "-".join(selected_class)
+                results.to_csv(general.check_exist(os.path.join(output_dir, name, "-".join(selected_class) + ".csv")), index=False)
 
-                figure_data = pandas.read_csv(os.path.join(output_dir, name, "-".join(selected_class) + ".csv"))
-                figure_data["Bacteria_Num"] = list(map(lambda x: len(general.num_to_bacteria(x)), figure_data["Number"]))
-
-                for value in ("balanced_accuracy_score", ) + general.aggregate_confusion_matrix(None):
-                    seaborn.set(context="poster", style="whitegrid")
-
-                    fig, ax = matplotlib.pyplot.subplots(figsize=(24, 24))
-                    seaborn.lineplot(x="Bacteria_Num", y=value, data=figure_data, ax=ax)
-
-                    ax.set_title("3-class (" + "+".join(selected_class) + ") with " + name)
-
-                    fig.savefig(general.check_exist(os.path.join(output_dir, name, "-".join(selected_class) + "-" + value + ".png")))
-                    matplotlib.pyplot.close(fig)
+                result_data.append(results.copy())
+    pandas.concat(result_data, ignore_index=True).to_csv(general.check_exist(os.path.join(output_dir, "statistics.csv")), index=False)
 
 
 if __name__ == "__main__":
