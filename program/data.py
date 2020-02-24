@@ -29,19 +29,6 @@ def get_data(input_file=default_xlsx_file, sheet_name=default_sheet_name, read_c
     return data
 
 
-def remove_ap(input_file=None, output_file=None):
-    if input_file is None:
-        raise ValueError(input_file)
-    elif not os.path.isfile(input_file):
-        raise ValueError(input_file)
-
-    data = pandas.read_csv(input_file)
-    data = data.loc[~(data["Classification"] == "Acute")]
-
-    data.to_csv(general.check_exist(input_file.replace(".csv", ".remove_ap.csv")), index=False)
-    return data
-
-
 def select_data(input_file=None, output_file=None, classes=None, bacteria=None):
     if input_file is None:
         raise ValueError(input_file)
@@ -81,7 +68,6 @@ if __name__ == "__main__":
 
     group1 = parser.add_mutually_exclusive_group(required=True)
     group1.add_argument("--xlsx", help="Read file is XLSX format", action="store_true", default=False)
-    group1.add_argument("--remove_ap", help="Remove AP in CSV", action="store_true", default=False)
     group1.add_argument("--select", help="Select amongst CSV", action="store_true", default=False)
     group1.add_argument("--number", help="Input is number only", action="store_true", default=False)
 
@@ -96,8 +82,6 @@ if __name__ == "__main__":
 
     if args.xlsx:
         data = get_data(read_columns=args.bacteria, output_file=args.output_file, sheet_name=args.sheet, input_file=default_xlsx_file)
-    elif args.remove_ap:
-        data = remove_ap(input_file=args.input_file, output_file=args.output_file)
     elif args.select:
         data = select_data(input_file=args.input_file, output_file=None, classes=args.classes, bacteria=args.bacteria)
     elif args.number:

@@ -24,9 +24,6 @@ start: tmp.sh
 $(RESULTS_DIRECTORY)/csv/default.csv: data.py
 	$(PYTHON3) $(abspath $<) --xlsx --output_file $@
 
-$(RESULTS_DIRECTORY)/csv/%.remove_ap.csv: data.py $(RESULTS_DIRECTORY)/csv/%.csv
-	$(PYTHON3) $(abspath $(filter %.py, $^)) --remove_ap --input_file $(filter %.csv, $^) --output_file $@
-
 $(RESULTS_DIRECTORY)/csv/default.%.csv: data.py $(RESULTS_DIRECTORY)/csv/default.csv
 	$(PYTHON3) $(abspath $(filter %.py, $^)) --number --input_file $(filter %.csv, $^) --output_file $@
 
