@@ -7,8 +7,8 @@ relative_values = sorted(["Aa_relative", "Pg_relative", "Tf_relative", "Td_relat
 whole_values = absolute_values + relative_values
 
 classes = ["Healthy", "Slight", "Moderate", "Severe", "Acute"]
-two_class_combinations = itertools.combinations(classes, 2)
-three_class_combinations = itertools.combinations(classes, 3)
+two_class_combinations = list(itertools.combinations(classes, 2))
+three_class_combinations = list(itertools.combinations(classes, 3))
 
 default_result_directory = os.path.realpath("../results")
 
