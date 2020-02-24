@@ -57,7 +57,7 @@ def select_data(input_file=None, output_file=None, classes=None, bacteria=None):
         output_file = input_file.replace(".csv", "") + "." + str(general.class_to_num(classes)) + "-" + str(general.bacteria_to_num(bacteria)) + ".csv"
 
     data = data.loc[(data["Classification"].isin(classes))]
-    data = data[["ID"] + bacteria]
+    data = data[["ID", "Classification"] + bacteria]
 
     data.to_csv(output_file, index=False)
     return data
