@@ -9,6 +9,7 @@ whole_values = absolute_values + relative_values
 classes = ["Healthy", "Slight", "Moderate", "Severe", "Acute"]
 two_class_combinations = list(itertools.combinations(classes, 2))
 three_class_combinations = list(itertools.combinations(classes, 3))
+four_class_combinations = list(itertools.combinations(classes, 4))
 
 default_result_directory = os.path.realpath("../results")
 
