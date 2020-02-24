@@ -50,11 +50,50 @@ def headquarter_four_class_classifier(jobs=30, input_file=None, output_dir=None)
             results += pool.starmap(actual_four_class_classifier, [(classifier, train_data.copy(), test_data.copy(), os.path.join(output_dir, name), i * (2 ** len(general.absolute_values))) for i in range(1, 2 ** len(general.relative_values))])
 
             pandas.DataFrame(results[1:], columns=results[0]).to_csv(general.check_exist(os.path.join(output_dir, name, "statistics.csv")), index=False)
-            break
+
+
+def actual_three_class_classifier(classifier, train_data, test_data, output_dir, bacteria_num):
+    train_answer = train_data.pop("Classification")
+    test_answer = test_data.pop("Classification")
+
+    train_data = train_data[general.num_to_bacteria(bacteria_num)]
+    test_data = test_data[general.num_to_bacteria(bacteria_num)]
+
+    classifier.fit(train_data, train_answer)
+
+    prediction = classifier.predict(test_data)
+    return (bacteria_num, sklearn.metrics.balanced_accuracy_score(test_answer, prediction)) + general.aggregate_confusion_matrix(numpy.sum(sklearn.metrics.multilabel_confusion_matrix(test_answer, prediction), axis=0, dtype=int))
+
+
+def headquarter_three_class_classifier(jobs=30, input_file=None, output_dir=None):
+    if (input_file is None) or (output_dir is None):
+        raise ValueError
+    elif not os.path.isfile(input_file):
+        raise ValueError(input_file)
+
+    data = pandas.read_csv(input_file)
+    data = data[["Classification"] + general.whole_values]
+
+    for one_class, two_class in general.two_class_combinations:
+        class_column = list(map(lambda x: one_class + two_class if x in [one_class, two_class] else x, list(data["Classification"])))
+        train_data, test_data = sklearn.model_selection.train_test_split(data, test_size=0.1, random_state=0, stratify=class_column)
+
+        with multiprocessing.Pool(processes=jobs) as pool:
+            for name, classifier in classifiers:
+                results = [("Number", "balanced_accuracy_score") + general.aggregate_confusion_matrix(None)]
+
+                results += pool.starmap(actual_three_class_classifier, [(classifier, train_data.copy(), test_data.copy(), os.path.join(output_dir, name), i) for i in range(1, 2 ** len(general.absolute_values))])
+                results += pool.starmap(actual_three_class_classifier, [(classifier, train_data.copy(), test_data.copy(), os.path.join(output_dir, name), i * (2 ** len(general.absolute_values))) for i in range(1, 2 ** len(general.relative_values))])
+
+                pandas.DataFrame(results[1:], columns=results[0]).to_csv(general.check_exist(os.path.join(output_dir, name, one_class + "-" + two_class + ".csv")), index=False)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+
+    group1 = parser.add_mutually_exclusive_group(required=True)
+    group1.add_argument("--four", help="Use four-class classification", action="store_true", default=False)
+    group1.add_argument("--three", help="Use three-class classification", action="store_true", default=False)
 
     parser.add_argument("-v", "--verbose", help="Verbose output", action="store_true", default=False)
     parser.add_argument("-i", "--input_file", help="File name to input", default=None)
@@ -63,4 +102,9 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    headquarter_four_class_classifier(jobs=args.jobs, input_file=args.input_file, output_dir=args.output_dir)
+    if args.four:
+        headquarter_four_class_classifier(jobs=args.jobs, input_file=args.input_file, output_dir=args.output_dir)
+    elif args.three:
+        headquarter_three_class_classifier(jobs=args.jobs, input_file=args.input_file, output_dir=args.output_dir)
+    else:
+        exit("Something went wrong")

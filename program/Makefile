@@ -1,6 +1,6 @@
 # Variables
 RANDOM = $(shell bash -c 'echo $$RANDOM')
-JOBS = 32
+JOBS = 10
 PWD = $(shell pwd)
 
 # Tools
@@ -34,8 +34,11 @@ $(RESULTS_DIRECTORY)/tsne/%.csv: tsne.py $(RESULTS_DIRECTORY)/csv/%.csv
 $(RESULTS_DIRECTORY)/tsne/%.png: tsne.py $(RESULTS_DIRECTORY)/tsne/%.csv
 	$(PYTHON3) $(abspath $(filter %.py, $^)) --draw --input_file $(filter %.csv, $^) --output_file $@
 
-# 4-class
+# Multiclass
 $(RESULTS_DIRECTORY)/4-class: multiclass_classification.py $(RESULTS_DIRECTORY)/csv/default.csv
-	$(PYTHON3) $(abspath $(filter %.py, $^)) --input_file $(filter %.csv, $^) --output_dir $@ --jobs $(JOBS)
+	$(PYTHON3) $(abspath $(filter %.py, $^)) --four --input_file $(filter %.csv, $^) --output_dir $@ --jobs $(JOBS)
 
-latest: $(RESULTS_DIRECTORY)/4-class
+$(RESULTS_DIRECTORY)/3-class: multiclass_classification.py $(RESULTS_DIRECTORY)/csv/default.csv
+	$(PYTHON3) $(abspath $(filter %.py, $^)) --three --input_file $(filter %.csv, $^) --output_dir $@ --jobs $(JOBS)
+
+latest: $(RESULTS_DIRECTORY)/3-class
