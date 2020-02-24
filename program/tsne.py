@@ -9,6 +9,7 @@ import sklearn.manifold
 import general
 
 default_tsne_directory = os.path.join(general.default_result_directory, "tsne")
+tsne_columns = general.whole_values + ["AL", "PD", "DNA", "Total Bacteria"]
 
 
 def get_tsne(csv_file=None, tsne_file=None, random_state=0):
@@ -22,13 +23,11 @@ def get_tsne(csv_file=None, tsne_file=None, random_state=0):
 
     data = pandas.read_csv(csv_file)
 
-    tsne_data = pandas.DataFrame(sklearn.manifold.TSNE(n_components=2, random_state=random_state, init="pca").fit_transform(data[list(filter(lambda x: x in general.whole_values, list(data.columns)))]), columns=["TSNE1", "TSNE2"])
+    tsne_data = pandas.DataFrame(sklearn.manifold.TSNE(n_components=2, random_state=random_state, init="pca").fit_transform(data[list(filter(lambda x: x in tsne_columns, list(data.columns)))]), columns=["TSNE1", "TSNE2"])
     for column in list(tsne_data.columns):
         tsne_data[column] = scipy.stats.zscore(tsne_data[column])
     for column in ["ID", "Classification"]:
         tsne_data[column] = data[column]
-
-    tsne_data.sort_values(by=["Classification"], inplace=True, axis="columns")
 
     tsne_data.to_csv(general.check_exist(tsne_file), index=False)
     return tsne_file
