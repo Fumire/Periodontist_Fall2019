@@ -1,7 +1,10 @@
 import argparse
 import os
 import multiprocessing
+import matplotlib
+import matplotlib.pyplot
 import numpy
+import seaborn
 import sklearn.ensemble
 import sklearn.gaussian_process
 import sklearn.metrics
@@ -51,6 +54,20 @@ def headquarter_four_class_classifier(jobs=30, input_file=None, output_dir=None)
 
             pandas.DataFrame(results[1:], columns=results[0]).to_csv(general.check_exist(os.path.join(output_dir, name, "statistics.csv")), index=False)
 
+            data = pandas.read_csv(os.path.join(output_dir, name, "statistics.csv"))
+            data["Bacteria_Num"] = list(map(lambda x: len(general.num_to_bacteria(x)), data["Number"]))
+
+            for value in ("balanced_accuracy_score", ) + general.aggregate_confusion_matrix(None):
+                seaborn.set(context="poster", style="whitegrid")
+
+                fig, ax = matplotlib.pyplot.subplots(figsize=(24, 24))
+                seaborn.lineplot(x="Bacteria_Num", y=value, data=data, ax=ax)
+
+                ax.set_title("4-class with " + name)
+
+                fig.savefig(general.check_exist(os.path.join(output_dir, name, value + ".png")))
+                matplotlib.pyplot.close(fig)
+
 
 def actual_three_class_classifier(classifier, train_data, test_data, output_dir, bacteria_num):
     train_answer = train_data.pop("Classification")
@@ -86,6 +103,20 @@ def headquarter_three_class_classifier(jobs=30, input_file=None, output_dir=None
                 results += pool.starmap(actual_three_class_classifier, [(classifier, train_data.copy(), test_data.copy(), os.path.join(output_dir, name), i * (2 ** len(general.absolute_values))) for i in range(1, 2 ** len(general.relative_values))])
 
                 pandas.DataFrame(results[1:], columns=results[0]).to_csv(general.check_exist(os.path.join(output_dir, name, one_class + "-" + two_class + ".csv")), index=False)
+
+                data = pandas.read_csv(os.path.join(output_dir, name, one_class + "-" + two_class + ".csv"))
+                data["Bacteria_Num"] = list(map(lambda x: len(general.num_to_bacteria(x)), data["Number"]))
+
+                for value in ("balanced_accuracy_score", ) + general.aggregate_confusion_matrix(None):
+                    seaborn.set(context="poster", style="whitegrid")
+
+                    fig, ax = matplotlib.pyplot.subplots(figsize=(24, 24))
+                    seaborn.lineplot(x="Bacteria_Num", y=value, data=data, ax=ax)
+
+                    ax.set_title("3-class (%s+%s) with " % (one_class, two_class) + name)
+
+                    fig.savefig(general.check_exist(os.path.join(output_dir, name, one_class + "-" + two_class + "-" + value + ".png")))
+                    matplotlib.pyplot.close(fig)
 
 
 if __name__ == "__main__":
