@@ -1,6 +1,6 @@
 # Variables
 RANDOM = $(shell bash -c 'echo $$RANDOM')
-THREADS = 32
+JOBS = 32
 PWD = $(shell pwd)
 
 # Tools
@@ -22,7 +22,7 @@ start: tmp.sh
 
 # data
 $(RESULTS_DIRECTORY)/csv/default.csv: data.py
-	$(PYTHON3) $(abspath $<) --xlsx --output_file $@
+	$(PYTHON3) $(abspath $(filter %.py, $^)) --xlsx --output_file $@
 
 $(RESULTS_DIRECTORY)/csv/default.%.csv: data.py $(RESULTS_DIRECTORY)/csv/default.csv
 	$(PYTHON3) $(abspath $(filter %.py, $^)) --number --input_file $(filter %.csv, $^) --output_file $@
@@ -34,4 +34,8 @@ $(RESULTS_DIRECTORY)/tsne/%.csv: tsne.py $(RESULTS_DIRECTORY)/csv/%.csv
 $(RESULTS_DIRECTORY)/tsne/%.png: tsne.py $(RESULTS_DIRECTORY)/tsne/%.csv
 	$(PYTHON3) $(abspath $(filter %.py, $^)) --draw --input_file $(filter %.csv, $^) --output_file $@
 
-latest: $(RESULTS_DIRECTORY)/tsne/default.png
+# 4-class
+$(RESULTS_DIRECTORY)/4-class: multiclass_classification.py $(RESULTS_DIRECTORY)/csv/default.csv
+	$(PYTHON3) $(abspath $(filter %.py, $^)) --input_file $(filter %.csv, $^) --output_dir $@ --jobs $(JOBS)
+
+latest: $(RESULTS_DIRECTORY)/4-class
