@@ -48,6 +48,7 @@ def draw_tsne(tsne_file=None, png_file=None):
     seaborn.scatterplot(data=pandas.read_csv(tsne_file), x="TSNE1", y="TSNE2", hue="Classification", style="Classification", legend="full", ax=ax)
 
     fig.savefig(general.check_exist(png_file))
+    matplotlib.pyplot.close(fig)
 
 
 if __name__ == "__main__":
