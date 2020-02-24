@@ -24,7 +24,6 @@ def get_data(input_file=default_xlsx_file, sheet_name=default_sheet_name, read_c
     data = data[extra_columns + read_columns]
     data.rename(columns=rename_columns, inplace=True)
     data["Classification"] = list(map(lambda x: {"Healthy": "Healthy", "CP_E": "Slight", "CP_M": "Moderate", "CP_S": "Severe", "AP": "Acute"}[x], data["Classification"]))
-    data["Classification_Number"] = list(map(lambda x: {"Healthy": 0, "Slight": 1, "Moderate": 2, "Severe": 3, "AP": 4}, data["Classification"]))
 
     data.to_csv(general.check_exist(output_file), index=False)
     return data
@@ -68,10 +67,10 @@ def select_data(input_file=None, output_file=None, classes=None, bacteria=None):
         bacteria.sort()
 
     if output_file is None:
-        output_file = input_file.replace(".csv", "") + "." + "_".join(classes) + "." + "_".join(bacteria) + ".csv"
+        output_file = input_file.replace(".csv", "") + "+" + str(general.class_to_num(classes)) + "+" + str(general.bacteria_to_num(bacteria)) + ".csv"
 
     data = data.loc[(data["Classification"].isin(classes))]
-    data = data[bacteria]
+    data = data[["ID"] + bacteria]
 
     data.to_csv(output_file, index=False)
     return data
