@@ -1,3 +1,4 @@
+import argparse
 import itertools
 import os
 
@@ -31,7 +32,7 @@ def class_to_num(given_classes):
 
 
 def num_to_class(num):
-    if num > 2 ** len(classes) or num < 1:
+    if num > 2 ** len(classes) or num < 0:
         raise ValueError
     return list(map(lambda x: x[1], list(filter(lambda x: 2 ** x[0] & num, list(enumerate(classes))))))
 
@@ -44,13 +45,23 @@ def bacteria_to_num(bacteria):
 
 
 def num_to_bacteria(num):
-    if num > 2 ** len(whole_values) or num < 1:
+    if num > 2 ** len(whole_values) or num < 0:
         raise ValueError
     return list(map(lambda x: x[1], list(filter(lambda x: 2 ** x[0] & num, list(enumerate(whole_values))))))
 
 
 if __name__ == "__main__":
-    print(class_to_num(classes[:-2]))
-    print(num_to_class(23))
-    print(bacteria_to_num(whole_values))
-    print(num_to_bacteria(12345))
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("-c", "--classes", help="class to choose", nargs="+", choices=classes, default=[])
+    parser.add_argument("-b", "--bacteria", help="Bacteria to choose", nargs="+", choices=whole_values, default=[])
+
+    parser.add_argument("--classnum", help="Number changed into class", type=int, default=0)
+    parser.add_argument("--bacterianum", help="Number changed into bacteria", type=int, default=0)
+
+    args = parser.parse_args()
+
+    print("class to num:", class_to_num(args.classes))
+    print("bacteria to num:", bacteria_to_num(args.bacteria))
+    print("num to class", num_to_class(args.classnum))
+    print("num to bacteria", num_to_bacteria(args.bacterianum))
