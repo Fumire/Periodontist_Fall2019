@@ -10,8 +10,6 @@ PYTHON3 = /BiO/Live/jwlee230/.pyenv/shims/python3
 RESULTS_DIRECTORY = /BiO/Research/Periodontist_Fall2019/results
 
 all:
-	if [ ! -d $(PWD)/log ]; then mkdir $(PWD)/log; fi;
-	echo "make -C $(PWD) absolute_real relative_real both_real" > tmp.sh
 .PHONY += all
 
 clean:
@@ -20,8 +18,6 @@ clean:
 .PHONY += clean
 
 start: tmp.sh
-	if [ ! -d $(PWD)/log ]; then mkdir $(PWD)/log; fi;
-	qsub -N Perio -pe smp $(THREADS) -o $(PWD)/log/stdout -e $(PWD)/log/stderr $<
 .PHONY += start
 
 # data
@@ -30,6 +26,9 @@ $(RESULTS_DIRECTORY)/csv/default.csv: data.py
 
 $(RESULTS_DIRECTORY)/csv/%.remove_ap.csv: data.py $(RESULTS_DIRECTORY)/csv/%.csv
 	$(PYTHON3) $(abspath $(filter %.py, $^)) --remove_ap --input_file $(filter %.csv, $^) --output_file $@
+
+$(RESULTS_DIRECTORY)/csv/default.%.csv: data.py $(RESULTS_DIRECTORY)/csv/default.csv
+	$(PYTHON3) $(abspath $(filter %.py, $^)) --number --input_file $(filter %.csv, $^) --output_file $@
 
 # tsne
 $(RESULTS_DIRECTORY)/tsne/%.csv: tsne.py $(RESULTS_DIRECTORY)/csv/%.csv

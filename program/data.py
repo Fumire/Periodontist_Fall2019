@@ -67,7 +67,7 @@ def select_data(input_file=None, output_file=None, classes=None, bacteria=None):
         bacteria.sort()
 
     if output_file is None:
-        output_file = input_file.replace(".csv", "") + "+" + str(general.class_to_num(classes)) + "+" + str(general.bacteria_to_num(bacteria)) + ".csv"
+        output_file = input_file.replace(".csv", "") + "." + str(general.class_to_num(classes)) + "-" + str(general.bacteria_to_num(bacteria)) + ".csv"
 
     data = data.loc[(data["Classification"].isin(classes))]
     data = data[["ID"] + bacteria]
@@ -83,6 +83,7 @@ if __name__ == "__main__":
     group1.add_argument("--xlsx", help="Read file is XLSX format", action="store_true", default=False)
     group1.add_argument("--remove_ap", help="Remove AP in CSV", action="store_true", default=False)
     group1.add_argument("--select", help="Select amongst CSV", action="store_true", default=False)
+    group1.add_argument("--number", help="Input is number only", action="store_true", default=False)
 
     parser.add_argument("-v", "--verbose", help="Verbose output", action="store_true", default=False)
     parser.add_argument("-i", "--input_file", help="File name to input", default=None)
@@ -99,6 +100,10 @@ if __name__ == "__main__":
         data = remove_ap(input_file=args.input_file, output_file=args.output_file)
     elif args.select:
         data = select_data(input_file=args.input_file, output_file=None, classes=args.classes, bacteria=args.bacteria)
+    elif args.number:
+        tmp = args.output_file.split(".")
+        numbers = list(map(int, tmp[-2].split("-")))
+        data = select_data(input_file=args.input_file, output_file=args.output_file, classes=general.num_to_class(numbers[0]), bacteria=general.num_to_bacteria(numbers[1]))
     else:
         exit("Something went wrong")
 
