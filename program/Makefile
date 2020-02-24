@@ -35,13 +35,13 @@ $(RESULTS_DIRECTORY)/tsne/%.png: tsne.py $(RESULTS_DIRECTORY)/tsne/%.csv
 	$(PYTHON3) $(abspath $(filter %.py, $^)) --draw --input_file $(filter %.csv, $^) --output_file $@
 
 # Multiclass
-$(RESULTS_DIRECTORY)/5-class: multiclass_classification.py $(RESULTS_DIRECTORY)/csv/default.csv
-	$(PYTHON3) $(abspath $(filter %.py, $^)) --five --input_file $(filter %.csv, $^) --output_dir $@ --jobs $(JOBS)
+$(RESULTS_DIRECTORY)/5-class/statistics.csv: multiclass_classification.py $(RESULTS_DIRECTORY)/csv/default.csv
+	$(PYTHON3) $(abspath $(filter %.py, $^)) --five --input_file $(filter %.csv, $^) --output_dir $(dir $@) --jobs $(JOBS)
 
-$(RESULTS_DIRECTORY)/4-class: multiclass_classification.py $(RESULTS_DIRECTORY)/csv/default.csv
-	$(PYTHON3) $(abspath $(filter %.py, $^)) --four --input_file $(filter %.csv, $^) --output_dir $@ --jobs $(JOBS)
+$(RESULTS_DIRECTORY)/4-class/statistics.csv: multiclass_classification.py $(RESULTS_DIRECTORY)/csv/default.csv
+	$(PYTHON3) $(abspath $(filter %.py, $^)) --four --input_file $(filter %.csv, $^) --output_dir $(dir $@) --jobs $(JOBS)
 
-$(RESULTS_DIRECTORY)/3-class: multiclass_classification.py $(RESULTS_DIRECTORY)/csv/default.csv
-	$(PYTHON3) $(abspath $(filter %.py, $^)) --three --input_file $(filter %.csv, $^) --output_dir $@ --jobs $(JOBS)
+$(RESULTS_DIRECTORY)/3-class/statistics.csv: multiclass_classification.py $(RESULTS_DIRECTORY)/csv/default.csv
+	$(PYTHON3) $(abspath $(filter %.py, $^)) --three --input_file $(filter %.csv, $^) --output_dir $(dir $@) --jobs $(JOBS)
 
-latest: $(RESULTS_DIRECTORY)/5-class $(RESULTS_DIRECTORY)/4-class $(RESULTS_DIRECTORY)/3-class
+latest: $(RESULTS_DIRECTORY)/5-class/statistics.csv $(RESULTS_DIRECTORY)/4-class/statistics.csv $(RESULTS_DIRECTORY)/3-class/statistics.csv
