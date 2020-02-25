@@ -45,9 +45,14 @@ $(RESULTS_DIRECTORY)/3-class/statistics.csv: multiclass_classification.py $(RESU
 	$(PYTHON3) $(abspath $(filter %.py, $^)) --three --input_file $(filter %.csv, $^) --output_dir $(dir $@) --jobs $(JOBS)
 
 # Two-class
+$(RESULTS_DIRECTORY)/2-class/one-vs-one/statistics.csv: biclass_classification.py $(RESULTS_DIRECTORY)/csv/default.csv
+	$(PYTHON3) $(abspath $(filter %.py, $^)) --ovo --input_file $(filter %.csv, $^) --output_dir $(dir $@) --jobs $(JOBS)
+
+$(RESULTS_DIRECTORY)/2-class/one-vs-rest/statistics.csv: biclass_classification.py $(RESULTS_DIRECTORY)/csv/default.csv
+	$(PYTHON3) $(abspath $(filter %.py, $^)) --ovr --input_file $(filter %.csv, $^) --output_dir $(dir $@) --jobs $(JOBS)
 
 # Classification Plot
 $(RESULTS_DIRECTORY)/3-class/plot: draw_classification.py $(RESULTS_DIRECTORY)/3-class/statistics.csv
 	$(PYTHON3) $(abspath $(filter %.py, $^)) --stat --input_file $(filter %.csv, $^) --output_dir $@
 
-latest: $(RESULTS_DIRECTORY)/3-class/plot
+latest: $(RESULTS_DIRECTORY)/2-class/one-vs-rest/statistics.csv
