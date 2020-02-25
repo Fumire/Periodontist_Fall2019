@@ -8,13 +8,14 @@ import seaborn
 parser = argparse.ArgumentParser()
 
 parser.add_argument("-v", "--verbose", help="Verbose output", action="store_true", default=False)
-parser.add_argument("-f", "--file_name", help="File name to read data (should be XLSX)", type=str, default="/BiO/Store/Helixco/Periodontist_Fall2019/data/Periodontitis_input_dataset_from_784samples_and_additional_54samples_20190730.xlsx")
+parser.add_argument("-f", "--file_name", help="File name to read data (should be XLSX)", type=str, default=os.path.realpath("../../data/Periodontitis_input_dataset_from_784samples_and_additional_54samples_20190730.xlsx"))
 parser.add_argument("-b", "--bacteria", help="Bacteria to use (e.g. Aa)", action="append", type=str, default=[], choices=sorted(["Aa", "Pg", "Tf", "Td", "Pi", "Fn", "Pa", "Cr", "Ec"]))
 parser.add_argument("-c", "--classification", help="Classification to use (amongst Healthy, CP_E, CP_M & CP_S)", action="append", type=str, default=[], choices=["Healthy", "CP_E", "CP_M", "CP_S"])
 parser.add_argument("--include_ap", help="Include AP", action="store_true", default=False)
 parser.add_argument("-p", "--png", help="PNG file name", type=str, default="corr.png")
 parser.add_argument("-t", "--title", help="Add title to PNG file", action="store_true", default=False)
 parser.add_argument("-m", "--method", help="Method to calculate correlation", choices=["pearson", "kendall", "spearman"], default="pearson")
+parser.add_argument("-s", "--sheet", help="Sheet to calculate correlation", choices=["730_samples", "54_samples"], nargs="+", default=["730_samples", "54_samples"])
 
 group1 = parser.add_mutually_exclusive_group(required=True)
 group1.add_argument("--abs", help="Use absolute values", action="store_true", default=False)
@@ -59,7 +60,7 @@ data = data[args.bacteria]
 seaborn.set(context="poster", style="whitegrid")
 
 fig, ax = matplotlib.pyplot.subplots(figsize=(24, 24))
-seaborn.heatmap(data.corr(method=args.method), robust=True, fmt=".2f", square=True, annot=True)
+seaborn.heatmap(data.corr(method=args.method), robust=True, fmt=".2f", square=True, annot=True, ax=ax)
 
 if args.title:
     ax.set_title("+".join(sorted(args.bacteria)))
