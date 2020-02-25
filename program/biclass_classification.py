@@ -13,7 +13,7 @@ import sklearn.tree
 import pandas
 import general
 
-max_iteration = 10
+max_iteration = 2 ** 30
 classifiers = [("KNeighbors", sklearn.neighbors.KNeighborsClassifier(algorithm="brute", n_jobs=1)), ("LinearSVC", sklearn.svm.SVC(kernel="linear", probability=True, random_state=0, class_weight="balanced", max_iter=max_iteration)), ("PolySVC", sklearn.svm.SVC(kernel="poly", probability=True, random_state=0, class_weight="balanced", max_iter=max_iteration)), ("RbfSVC", sklearn.svm.SVC(kernel="rbf", probability=True, random_state=0, class_weight="balanced", max_iter=max_iteration)), ("sigmoidSVC", sklearn.svm.SVC(kernel="sigmoid", probability=True, random_state=0, class_weight="balanced", max_iter=max_iteration)), ("DecisionTree", sklearn.tree.DecisionTreeClassifier(random_state=0, class_weight="balanced")), ("RandomForest", sklearn.ensemble.RandomForestClassifier(random_state=0, n_jobs=1, class_weight="balanced")), ("AdamNN", sklearn.neural_network.MLPClassifier(max_iter=max_iteration, random_state=0, early_stopping=True, solver="adam")), ("lbfgsNN", sklearn.neural_network.MLPClassifier(max_iter=max_iteration, random_state=0, early_stopping=True, solver="lbfgs")), ("AdaBoost", sklearn.ensemble.AdaBoostClassifier(random_state=0))]
 
 
@@ -58,7 +58,6 @@ def headquarter_ovo_classifier(input_file, output_dir, jobs):
                 results.to_csv(general.check_exist(os.path.join(output_dir, name, "-".join(selected_class) + ".csv")), index=False)
 
                 result_data.append(results)
-                break
 
     pandas.concat(result_data, ignore_index=True).to_csv(general.check_exist(os.path.join(output_dir, "statistics.csv")), index=False)
 
@@ -105,7 +104,6 @@ def headquarter_ovr_classifier(input_file, output_dir, jobs):
                 results.to_csv(general.check_exist(os.path.join(output_dir, name, "-".join(selected_class) + ".csv")), index=False)
 
                 result_data.append(results)
-                break
         data["Classification"] = original_class
 
     pandas.concat(result_data, ignore_index=True).to_csv(general.check_exist(os.path.join(output_dir, "statistics.csv")), index=False)
