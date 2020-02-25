@@ -31,7 +31,7 @@ if not args.file_name.endswith(".xlsx"):
 if not args.png.endswith(".png"):
     exit("Invalid file: " + args.png)
 
-data = pandas.concat(pandas.read_excel(args.file_name, sheet_name=["730_samples", "54_samples"]), ignore_index=True)
+data = pandas.concat(pandas.read_excel(args.file_name, sheet_name=args.sheet), ignore_index=True)
 
 if not args.bacteria:
     if args.verbose:
@@ -45,6 +45,9 @@ if not args.classification:
 
 if not args.include_ap:
     data = data.loc[~(data["Classification"] == "AP")]
+
+if args.verbose:
+    print(data)
 
 if args.abs:
     pass
