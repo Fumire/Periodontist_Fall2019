@@ -65,4 +65,8 @@ $(RESULTS_DIRECTORY)/depth/violin_AL.png: draw_depth.py $(RESULTS_DIRECTORY)/csv
 $(RESULTS_DIRECTORY)/depth/violin_PD.png: draw_depth.py $(RESULTS_DIRECTORY)/csv/default.csv
 	$(PYTHON3) $(abspath $(filter %.py, $^)) --violin --input_file $(filter %.csv, $^) --output_file $@ --column PD
 
-latest: $(RESULTS_DIRECTORY)/depth/violin_AL.png $(RESULTS_DIRECTORY)/depth/violin_PD.png
+# Regressor
+$(RESULTS_DIRECTORY)/Regression-AL/statistics.csv: regression.py $(RESULTS_DIRECTORY)/csv/default.csv
+	$(PYTHON3) $(abspath $(filter %.py, $^)) --input_file $(filter %.csv, $^) --output_dir $(dir $@) --column AL --jobs $(JOBS)
+
+latest: $(RESULTS_DIRECTORY)/Regression-AL/statistics.csv
