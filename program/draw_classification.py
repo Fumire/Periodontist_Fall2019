@@ -21,7 +21,7 @@ def draw_statistics(csv_file, output_dir):
             seaborn.set(context="poster", style="whitegrid")
             fig, ax = matplotlib.pyplot.subplots(figsize=(24, 24))
 
-            seaborn.lineplot(x="feature_num", y=statistics_value, hue="classifier", ax=ax, legend="full", data=selected_data)
+            seaborn.lineplot(x="feature_num", y=statistics_value, hue="classifier", ax=ax, legend="full", data=selected_data, hue_order=sorted(set(statistics_data["classifier"])))
 
             ax.set_title(combined_class.replace("-", " "))
 
