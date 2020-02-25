@@ -47,7 +47,7 @@ $(RESULTS_DIRECTORY)/3-class/statistics.csv: multiclass_classification.py $(RESU
 # Two-class
 
 # Classification Plot
-$(RESULTS_DIRECTORY)/plot: draw_classification.py $(RESULTS_DIRECTORY)/3-class/statistics.csv
-	$(PYTHON3) $(abspath $(filter %.py, $^)) --input_file $(filter %.csv, $^) --output_dir $@
+$(RESULTS_DIRECTORY)/3-class/plot: draw_classification.py $(RESULTS_DIRECTORY)/3-class/statistics.csv
+	$(PYTHON3) $(abspath $(filter %.py, $^)) --stat --input_file $(filter %.csv, $^) --output_dir $@
 
-latest: $(RESULTS_DIRECTORY)/plot
+latest: $(RESULTS_DIRECTORY)/3-class/plot
