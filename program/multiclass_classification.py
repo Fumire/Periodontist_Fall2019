@@ -13,7 +13,7 @@ import sklearn.tree
 import pandas
 import general
 
-max_iteration = 100
+max_iteration = 10
 classifiers = [("KNeighbors", sklearn.neighbors.KNeighborsClassifier(algorithm="brute", n_jobs=1)), ("LinearSVC", sklearn.svm.SVC(kernel="linear", probability=True, decision_function_shape="ovr", random_state=0, class_weight="balanced", max_iter=max_iteration)), ("PolySVC", sklearn.svm.SVC(kernel="poly", probability=True, decision_function_shape="ovr", random_state=0, class_weight="balanced", max_iter=max_iteration)), ("RbfSVC", sklearn.svm.SVC(kernel="rbf", probability=True, decision_function_shape="ovr", random_state=0, class_weight="balanced", max_iter=max_iteration)), ("sigmoidSVC", sklearn.svm.SVC(kernel="sigmoid", probability=True, decision_function_shape="ovr", random_state=0, class_weight="balanced", max_iter=max_iteration)), ("DecisionTree", sklearn.tree.DecisionTreeClassifier(random_state=0, class_weight="balanced")), ("RandomForest", sklearn.ensemble.RandomForestClassifier(random_state=0, n_jobs=1, class_weight="balanced")), ("AdamNN", sklearn.neural_network.MLPClassifier(max_iter=max_iteration, random_state=0, early_stopping=True, solver="adam")), ("lbfgsNN", sklearn.neural_network.MLPClassifier(max_iter=max_iteration, random_state=0, early_stopping=True, solver="lbfgs")), ("AdaBoost", sklearn.ensemble.AdaBoostClassifier(random_state=0))]
 
 
@@ -52,7 +52,7 @@ def headquarter_five_class_classifier(jobs=30, input_file=None, output_dir=None)
 
             results = pandas.DataFrame(results[1:], columns=results[0])
             results["classifier"] = name
-            results["combined_class"] = "vs".join(sorted(set(data["Classification"])))
+            results["combined_class"] = "-vs-".join(sorted(set(data["Classification"])))
             results.to_csv(general.check_exist(os.path.join(output_dir, name, "statistics.csv")), index=False)
 
     pandas.concat([pandas.read_csv(os.path.join(output_dir, name, "statistics.csv")) for name, classifier in classifiers], ignore_index=True).to_csv(general.check_exist(os.path.join(output_dir, "statistics.csv")), index=False)
@@ -98,7 +98,7 @@ def headquarter_four_class_classifier(jobs=30, input_file=None, output_dir=None)
 
                 results = pandas.DataFrame(results[1:], columns=results[0])
                 results["classifier"] = name
-                results["combined_class"] = "vs".join(sorted(set(data["Classification"])))
+                results["combined_class"] = "-vs-".join(sorted(set(data["Classification"])))
                 results.to_csv(general.check_exist(os.path.join(output_dir, name, "-".join(selected_class) + ".csv")), index=False)
 
                 result_data.append(results.copy())
@@ -132,6 +132,8 @@ def headquarter_three_class_classifier(jobs=30, input_file=None, output_dir=None
     data = data[["Classification"] + general.whole_values]
     result_data = list()
 
+    original_class = list(data["Classification"])
+
     for selected_class in general.three_class_combinations:
         data["Classification"] = list(map(lambda x: "+".join(selected_class) if x in selected_class else x, data["Classification"]))
         train_data, test_data = sklearn.model_selection.train_test_split(data, test_size=0.1, random_state=0, stratify=data["Classification"])
@@ -145,10 +147,13 @@ def headquarter_three_class_classifier(jobs=30, input_file=None, output_dir=None
 
                 results = pandas.DataFrame(results[1:], columns=results[0])
                 results["classifier"] = name
-                results["combined_class"] = "vs".join(sorted(set(data["Classification"])))
+                results["combined_class"] = "-vs-".join(sorted(set(data["Classification"])))
                 results.to_csv(general.check_exist(os.path.join(output_dir, name, "-".join(selected_class) + ".csv")), index=False)
 
                 result_data.append(results.copy())
+
+        data["Classification"] = original_class
+
     pandas.concat(result_data, ignore_index=True).to_csv(general.check_exist(os.path.join(output_dir, "statistics.csv")), index=False)
 
 
