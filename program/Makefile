@@ -55,4 +55,14 @@ $(RESULTS_DIRECTORY)/2-class/one-vs-rest/statistics.csv: biclass_classification.
 $(RESULTS_DIRECTORY)/3-class/plot: draw_classification.py $(RESULTS_DIRECTORY)/3-class/statistics.csv
 	$(PYTHON3) $(abspath $(filter %.py, $^)) --stat --input_file $(filter %.csv, $^) --output_dir $@
 
-latest: $(RESULTS_DIRECTORY)/2-class/one-vs-rest/statistics.csv
+# Draw about depth
+$(RESULTS_DIRECTORY)/depth/scatter.png: draw_depth.py $(RESULTS_DIRECTORY)/csv/default.csv
+	$(PYTHON3) $(abspath $(filter %.py, $^)) --scatter --input_file $(filter %.csv, $^) --output_file $@
+
+$(RESULTS_DIRECTORY)/depth/violin_AL.png: draw_depth.py $(RESULTS_DIRECTORY)/csv/default.csv
+	$(PYTHON3) $(abspath $(filter %.py, $^)) --violin --input_file $(filter %.csv, $^) --output_file $@ --column AL
+
+$(RESULTS_DIRECTORY)/depth/violin_PD.png: draw_depth.py $(RESULTS_DIRECTORY)/csv/default.csv
+	$(PYTHON3) $(abspath $(filter %.py, $^)) --violin --input_file $(filter %.csv, $^) --output_file $@ --column PD
+
+latest: $(RESULTS_DIRECTORY)/depth/violin_AL.png $(RESULTS_DIRECTORY)/depth/violin_PD.png
