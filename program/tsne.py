@@ -9,7 +9,7 @@ import sklearn.manifold
 import general
 
 default_tsne_directory = os.path.join(general.default_result_directory, "tsne")
-tsne_columns = general.whole_values + ["AL", "PD", "DNA", "Total Bacteria"]
+tsne_columns = general.whole_values + ["AL", "PD"]
 
 
 def get_tsne(csv_file=None, tsne_file=None, random_state=0):
