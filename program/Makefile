@@ -1,6 +1,6 @@
 # Variables
 RANDOM = $(shell bash -c 'echo $$RANDOM')
-JOBS = 10
+JOBS = 50
 PWD = $(shell pwd)
 
 # Tools
