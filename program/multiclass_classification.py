@@ -52,7 +52,7 @@ def headquarter_five_class_classifier(jobs=30, input_file=None, output_dir=None)
 
             results = pandas.DataFrame(results[1:], columns=results[0])
             results["classifier"] = name
-            results["combined_class"] = None
+            results["combined_class"] = "vs".join(sorted(set(data["Classification"])))
             results.to_csv(general.check_exist(os.path.join(output_dir, name, "statistics.csv")), index=False)
 
     pandas.concat([pandas.read_csv(os.path.join(output_dir, name, "statistics.csv")) for name, classifier in classifiers], ignore_index=True).to_csv(general.check_exist(os.path.join(output_dir, "statistics.csv")), index=False)
@@ -98,7 +98,7 @@ def headquarter_four_class_classifier(jobs=30, input_file=None, output_dir=None)
 
                 results = pandas.DataFrame(results[1:], columns=results[0])
                 results["classifier"] = name
-                results["combined_class"] = "-".join(selected_class)
+                results["combined_class"] = "vs".join(sorted(set(data["Classification"])))
                 results.to_csv(general.check_exist(os.path.join(output_dir, name, "-".join(selected_class) + ".csv")), index=False)
 
                 result_data.append(results.copy())
@@ -145,7 +145,7 @@ def headquarter_three_class_classifier(jobs=30, input_file=None, output_dir=None
 
                 results = pandas.DataFrame(results[1:], columns=results[0])
                 results["classifier"] = name
-                results["combined_class"] = "-".join(selected_class)
+                results["combined_class"] = "vs".join(sorted(set(data["Classification"])))
                 results.to_csv(general.check_exist(os.path.join(output_dir, name, "-".join(selected_class) + ".csv")), index=False)
 
                 result_data.append(results.copy())
