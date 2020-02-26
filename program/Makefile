@@ -75,4 +75,4 @@ $(RESULTS_DIRECTORY)/Regression-AL/statistics.csv: regression.py $(RESULTS_DIREC
 $(RESULTS_DIRECTORY)/Regression-PD/statistics.csv: regression.py $(RESULTS_DIRECTORY)/csv/default.csv
 	$(PYTHON3) $(abspath $(filter %.py,$^)) --input_file $(filter %.csv,$^) --output_dir $(dir $@) --column PD --jobs $(JOBS)
 
-latest: $(RESULTS_DIRECTORY)/3-class-plot/statistics $(RESULTS_DIRECTORY)/3-class-plot/extreme
+latest: $(RESULTS_DIRECTORY)/5-class-plot/extreme
