@@ -52,8 +52,23 @@ $(RESULTS_DIRECTORY)/2-class/one-vs-rest/statistics.csv: biclass_classification.
 	$(PYTHON3) $(abspath $(filter %.py,$^)) --ovr --input_file $(filter %.csv,$^) --output_dir $(dir $@) --jobs $(JOBS)
 
 # Classification Plot
-$(RESULTS_DIRECTORY)/3-class/plot: draw_classification.py $(RESULTS_DIRECTORY)/3-class/statistics.csv
+$(RESULTS_DIRECTORY)/3-class-plot/statistics: draw_classification.py $(RESULTS_DIRECTORY)/3-class/statistics.csv
 	$(PYTHON3) $(abspath $(filter %.py,$^)) --stat --input_file $(filter %.csv,$^) --output_dir $@
+
+$(RESULTS_DIRECTORY)/4-class-plot/statistics: draw_classification.py $(RESULTS_DIRECTORY)/4-class/statistics.csv
+	$(PYTHON3) $(abspath $(filter %.py,$^)) --stat --input_file $(filter %.csv,$^) --output_dir $@
+
+$(RESULTS_DIRECTORY)/5-class-plot/statistics: draw_classification.py $(RESULTS_DIRECTORY)/5-class/statistics.csv
+	$(PYTHON3) $(abspath $(filter %.py,$^)) --stat --input_file $(filter %.csv,$^) --output_dir $@
+
+$(RESULTS_DIRECTORY)/3-class-plot/extreme: draw_classification.py $(RESULTS_DIRECTORY)/3-class/statistics.csv
+	$(PYTHON3) $(abspath $(filter %.py,$^)) --extreme --input_file $(filter %.csv,$^) --output_dir $@
+
+$(RESULTS_DIRECTORY)/4-class-plot/extreme: draw_classification.py $(RESULTS_DIRECTORY)/4-class/statistics.csv
+	$(PYTHON3) $(abspath $(filter %.py,$^)) --extreme --input_file $(filter %.csv,$^) --output_dir $@
+
+$(RESULTS_DIRECTORY)/5-class-plot/extreme: draw_classification.py $(RESULTS_DIRECTORY)/5-class/statistics.csv
+	$(PYTHON3) $(abspath $(filter %.py,$^)) --extreme --input_file $(filter %.csv,$^) --output_dir $@
 
 # Draw about depth
 $(RESULTS_DIRECTORY)/depth/scatter.png: draw_depth.py $(RESULTS_DIRECTORY)/csv/default.csv
@@ -72,4 +87,4 @@ $(RESULTS_DIRECTORY)/Regression-AL/statistics.csv: regression.py $(RESULTS_DIREC
 $(RESULTS_DIRECTORY)/Regression-PD/statistics.csv: regression.py $(RESULTS_DIRECTORY)/csv/default.csv
 	$(PYTHON3) $(abspath $(filter %.py,$^)) --input_file $(filter %.csv,$^) --output_dir $(dir $@) --column PD --jobs $(JOBS)
 
-latest: $(RESULTS_DIRECTORY)/Regression-AL/statistics.csv
+latest: $(RESULTS_DIRECTORY)/3-class/plot/statistics $(RESULTS_DIRECTORY)/3-class/plot/extreme
