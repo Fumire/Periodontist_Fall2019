@@ -14,7 +14,7 @@ import sklearn.tree
 import pandas
 import general
 
-max_iteration = 100
+max_iteration = 2 ** 30
 regressors = [("LinearRegression", sklearn.linear_model.LinearRegression(n_jobs=1)), ("Ridge", sklearn.linear_model.Ridge(max_iter=max_iteration, random_state=0)), ("SVR", sklearn.svm.SVR(max_iter=max_iteration)), ("NuSVR", sklearn.svm.NuSVR(max_iter=max_iteration)), ("LinearSVR", sklearn.svm.LinearSVR(random_state=0, max_iter=max_iteration)), ("ElasticNet", sklearn.linear_model.ElasticNet(random_state=0, max_iter=max_iteration)), ("KNeighbors", sklearn.neighbors.KNeighborsRegressor(weights="distance", algorithm="brute", n_jobs=1)), ("DecisionTree", sklearn.tree.DecisionTreeRegressor(random_state=0)), ("AdamMLP", sklearn.neural_network.MLPRegressor(solver="adam", learning_rate="adaptive", max_iter=max_iteration, random_state=0, early_stopping=True)), ("lbfgsMLP", sklearn.neural_network.MLPRegressor(solver="lbfgs", learning_rate="adaptive", max_iter=max_iteration, random_state=0, early_stopping=True)), ("sgdMLP", sklearn.neural_network.MLPRegressor(solver="sgd", learning_rate="adaptive", max_iter=max_iteration, random_state=0, early_stopping=True))]
 
 
