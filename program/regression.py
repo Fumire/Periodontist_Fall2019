@@ -7,12 +7,15 @@ import seaborn
 import sklearn.linear_model
 import sklearn.metrics
 import sklearn.model_selection
+import sklearn.neighbors
+import sklearn.neural_network
 import sklearn.svm
+import sklearn.tree
 import pandas
 import general
 
 max_iteration = 100
-regressors = [("LinearRegression", sklearn.linear_model.LinearRegression(n_jobs=1)), ("Ridge", sklearn.linear_model.Ridge(max_iter=max_iteration, random_state=0)), ("SVR", sklearn.svm.SVR(max_iter=max_iteration)), ("NuSVR", sklearn.svm.NuSVR(max_iter=max_iteration)), ("LinearSVR", sklearn.svm.LinearSVR(random_state=0, max_iter=max_iteration))]
+regressors = [("LinearRegression", sklearn.linear_model.LinearRegression(n_jobs=1)), ("Ridge", sklearn.linear_model.Ridge(max_iter=max_iteration, random_state=0)), ("SVR", sklearn.svm.SVR(max_iter=max_iteration)), ("NuSVR", sklearn.svm.NuSVR(max_iter=max_iteration)), ("LinearSVR", sklearn.svm.LinearSVR(random_state=0, max_iter=max_iteration)), ("ElasticNet", sklearn.linear_model.ElasticNet(random_state=0, max_iter=max_iteration)), ("KNeighbors", sklearn.neighbors.KNeighborsRegressor(weights="distance", algorithm="brute", n_jobs=1)), ("DecisionTree", sklearn.tree.DecisionTreeRegressor(random_state=0)), ("AdamMLP", sklearn.neural_network.MLPRegressor(solver="adam", learning_rate="adaptive", max_iter=max_iteration, random_state=0, early_stopping=True)), ("lbfgsMLP", sklearn.neural_network.MLPRegressor(solver="lbfgs", learning_rate="adaptive", max_iter=max_iteration, random_state=0, early_stopping=True)), ("sgdMLP", sklearn.neural_network.MLPRegressor(solver="sgd", learning_rate="adaptive", max_iter=max_iteration, random_state=0, early_stopping=True))]
 
 
 def actual_regressor(regressor, train_data, test_data, output_dir, bacteria_num):
@@ -24,7 +27,7 @@ def actual_regressor(regressor, train_data, test_data, output_dir, bacteria_num)
 
     regressor.fit(train_data, train_answer)
 
-    return bacteria_num, regressor.score(test_data, test_answer)
+    return bacteria_num, abs(regressor.score(test_data, test_answer))
 
 
 def headquarter_regressor(input_file, output_dir, watch, jobs=30):
