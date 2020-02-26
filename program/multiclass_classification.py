@@ -13,7 +13,7 @@ import sklearn.tree
 import pandas
 import general
 
-max_iteration = 2 ** 30
+max_iteration = 100
 classifiers = [("KNeighbors", sklearn.neighbors.KNeighborsClassifier(algorithm="brute", n_jobs=1)), ("LinearSVC", sklearn.svm.SVC(kernel="linear", probability=True, decision_function_shape="ovr", random_state=0, class_weight="balanced", max_iter=max_iteration)), ("PolySVC", sklearn.svm.SVC(kernel="poly", probability=True, decision_function_shape="ovr", random_state=0, class_weight="balanced", max_iter=max_iteration)), ("RbfSVC", sklearn.svm.SVC(kernel="rbf", probability=True, decision_function_shape="ovr", random_state=0, class_weight="balanced", max_iter=max_iteration)), ("sigmoidSVC", sklearn.svm.SVC(kernel="sigmoid", probability=True, decision_function_shape="ovr", random_state=0, class_weight="balanced", max_iter=max_iteration)), ("DecisionTree", sklearn.tree.DecisionTreeClassifier(random_state=0, class_weight="balanced")), ("RandomForest", sklearn.ensemble.RandomForestClassifier(random_state=0, n_jobs=1, class_weight="balanced")), ("AdamNN", sklearn.neural_network.MLPClassifier(max_iter=max_iteration, random_state=0, early_stopping=True, solver="adam")), ("lbfgsNN", sklearn.neural_network.MLPClassifier(max_iter=max_iteration, random_state=0, early_stopping=True, solver="lbfgs")), ("AdaBoost", sklearn.ensemble.AdaBoostClassifier(random_state=0))]
 
 
@@ -26,9 +26,10 @@ def actual_five_class_classifier(classifier, train_data, test_data, output_dir, 
 
     classifier.fit(train_data, train_answer)
 
-    pandas.DataFrame(classifier.predict_proba(test_data), columns=sorted(set(test_answer))).to_csv(general.check_exist(os.path.join(output_dir, str(bacteria_num) + ".csv")), index=False)
+    pandas.DataFrame(classifier.predict_proba(test_data), columns=sorted(set(test_answer))).to_csv(general.check_exist(os.path.join(output_dir, "Probability_" + str(bacteria_num) + ".csv")), index=False)
 
     prediction = classifier.predict(test_data)
+    pandas.DataFrame(zip(test_answer, prediction), columns=["real", "prediction"]).to_csv(general.check_exist(os.path.join(output_dir, "Prediction_" + str(bacteria_num) + ".csv")), index=False)
     return (bacteria_num, sklearn.metrics.balanced_accuracy_score(test_answer, prediction)) + general.aggregate_confusion_matrix(numpy.sum(sklearn.metrics.multilabel_confusion_matrix(test_answer, prediction), axis=0, dtype=int))
 
 
@@ -67,9 +68,11 @@ def actual_four_class_classifier(classifier, train_data, test_data, output_dir, 
 
     classifier.fit(train_data, train_answer)
 
-    pandas.DataFrame(classifier.predict_proba(test_data), columns=sorted(set(test_answer))).to_csv(general.check_exist(os.path.join(output_dir, str(bacteria_num) + "_" + str(class_num) + ".csv")), index=False)
+    pandas.DataFrame(classifier.predict_proba(test_data), columns=sorted(set(test_answer))).to_csv(general.check_exist(os.path.join(output_dir, "Probability_" + str(bacteria_num) + "_" + str(class_num) + ".csv")), index=False)
 
     prediction = classifier.predict(test_data)
+    pandas.DataFrame(zip(test_answer, prediction), columns=["real", "prediction"]).to_csv(general.check_exist(os.path.join(output_dir, "Prediction_" + str(bacteria_num) + "_" + str(class_num) + ".csv")), index=False)
+
     return (bacteria_num, sklearn.metrics.balanced_accuracy_score(test_answer, prediction)) + general.aggregate_confusion_matrix(numpy.sum(sklearn.metrics.multilabel_confusion_matrix(test_answer, prediction), axis=0, dtype=int))
 
 
@@ -116,9 +119,10 @@ def actual_three_class_classifier(classifier, train_data, test_data, output_dir,
 
     classifier.fit(train_data, train_answer)
 
-    pandas.DataFrame(classifier.predict_proba(test_data), columns=sorted(set(test_answer))).to_csv(general.check_exist(os.path.join(output_dir, str(bacteria_num) + "_" + str(class_num) + ".csv")), index=False)
+    pandas.DataFrame(classifier.predict_proba(test_data), columns=sorted(set(test_answer))).to_csv(general.check_exist(os.path.join(output_dir, "Probability_" + str(bacteria_num) + "_" + str(class_num) + ".csv")), index=False)
 
     prediction = classifier.predict(test_data)
+    pandas.DataFrame(zip(test_answer, prediction), columns=["real", "prediction"]).to_csv(general.check_exist(os.path.join(output_dir, "Prediction_" + str(bacteria_num) + "_" + str(class_num) + ".csv")), index=False)
     return (bacteria_num, sklearn.metrics.balanced_accuracy_score(test_answer, prediction)) + general.aggregate_confusion_matrix(numpy.sum(sklearn.metrics.multilabel_confusion_matrix(test_answer, prediction), axis=0, dtype=int))
 
 
@@ -142,8 +146,8 @@ def headquarter_three_class_classifier(jobs=30, input_file=None, output_dir=None
             for name, classifier in classifiers:
                 results = [("Number", "balanced_accuracy_score") + general.aggregate_confusion_matrix(None)]
 
-                results += pool.starmap(actual_four_class_classifier, [(classifier, train_data.copy(), test_data.copy(), os.path.join(output_dir, name), i, general.class_to_num(selected_class)) for i in range(1, 2 ** len(general.absolute_values))])
-                results += pool.starmap(actual_four_class_classifier, [(classifier, train_data.copy(), test_data.copy(), os.path.join(output_dir, name), i * (2 ** len(general.absolute_values)), general.class_to_num(selected_class)) for i in range(1, 2 ** len(general.relative_values))])
+                results += pool.starmap(actual_three_class_classifier, [(classifier, train_data.copy(), test_data.copy(), os.path.join(output_dir, name), i, general.class_to_num(selected_class)) for i in range(1, 2 ** len(general.absolute_values))])
+                results += pool.starmap(actual_three_class_classifier, [(classifier, train_data.copy(), test_data.copy(), os.path.join(output_dir, name), i * (2 ** len(general.absolute_values)), general.class_to_num(selected_class)) for i in range(1, 2 ** len(general.relative_values))])
 
                 results = pandas.DataFrame(results[1:], columns=results[0])
                 results["classifier"] = name
