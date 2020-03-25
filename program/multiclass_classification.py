@@ -13,7 +13,7 @@ import sklearn.tree
 import pandas
 import general
 
-max_iteration = 2 ** 30
+max_iteration = 1000
 classifiers = [("KNeighbors", sklearn.neighbors.KNeighborsClassifier(algorithm="brute", n_jobs=1)), ("LinearSVC", sklearn.svm.SVC(kernel="linear", probability=True, decision_function_shape="ovr", random_state=0, class_weight="balanced", max_iter=max_iteration)), ("PolySVC", sklearn.svm.SVC(kernel="poly", probability=True, decision_function_shape="ovr", random_state=0, class_weight="balanced", max_iter=max_iteration)), ("RbfSVC", sklearn.svm.SVC(kernel="rbf", probability=True, decision_function_shape="ovr", random_state=0, class_weight="balanced", max_iter=max_iteration)), ("sigmoidSVC", sklearn.svm.SVC(kernel="sigmoid", probability=True, decision_function_shape="ovr", random_state=0, class_weight="balanced", max_iter=max_iteration)), ("DecisionTree", sklearn.tree.DecisionTreeClassifier(random_state=0, class_weight="balanced")), ("RandomForest", sklearn.ensemble.RandomForestClassifier(random_state=0, n_jobs=1, class_weight="balanced")), ("AdamNN", sklearn.neural_network.MLPClassifier(max_iter=max_iteration, random_state=0, early_stopping=True, solver="adam")), ("lbfgsNN", sklearn.neural_network.MLPClassifier(max_iter=max_iteration, random_state=0, early_stopping=True, solver="lbfgs")), ("AdaBoost", sklearn.ensemble.AdaBoostClassifier(random_state=0))]
 
 
