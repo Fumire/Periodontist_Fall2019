@@ -107,7 +107,7 @@
     			\label{fig:depth}
     		\end{figure}
     	
-    		Periodontitis is diagnosed by measuring clinical attachment loss (CAL). Note that the CAL is the length of the figure \ref{fig:depth}-1, which is sum of gingival recession (figure \ref{fig:depth}-2) and probing depth (figure \ref{fig:depth}-3).
+    		Periodontitis is diagnosed by measuring clinical attachment loss (CAL). Note that the CAL is the length of the figure \ref{fig:depth}-1, which is sum of gingival recession (GR) in figure \ref{fig:depth}-2, and probing depth (PD) in figure \ref{fig:depth}-3.
     		
     		Periodontitis is generally believed to be a result of a host-parasite interaction in which bacteria are the determinants of periodontitis \cite{ref:cause1}. In etiology, the primary cause of periodontitis is presumed as a bacterial infection as the primary cause of periodontitis \cite{ref:perio1}. Thus, the treatment of periodontitis includes antibiotics and dental surgery.
     		
@@ -119,17 +119,19 @@
     		If the feedback provides the correct answer for specific inputs, then learning problem is called supervised learning \cite{ref:ai1}. Classification is a kind of supervised learning for discrete values; regression is for continuous values.
     		
     	\subsection{Purpose of Research}
-    		There are many studies which have tried to find bacteria as bio-markers \cite{ref:biomarker1, ref:biomarker2}. 
+    		There are many studies which have tried to find bacteria as bio-markers \cite{ref:biomarker1, ref:biomarker2}. Most of these papers, though, researched in Western people \cite{ref:west1, ref:west2}. As I mentioned herein-above, oral bacteria population may differ between Western and non-Western. In this approach, therefore, prediction periodontitis from machine learning which based on oral bacteria population of Korean is required. 
     		
     		Hence, the purposes of this research are as:
     		\begin{enumerate}
 				\item Classify the stage of periodontitis by oral bacteria.
-				\item Regress the CAL, gingival recession, or probing depth by oral bacteria. 
+				\item Regress the CAL, the GR, or the PD by oral bacteria. 
     		\end{enumerate}
     
     \section{Materials}
     
     \section{Methods}
+    	The entire program is disclosed by GitHub in \url{https://github.com/Fumire/Periodontist_Fall2019}. 
+    
     	\subsection{Python Packages}
     		Python programming language had been used to analyze data. Also, many Python modules had been adopted as hereinafter.
     		
@@ -169,10 +171,7 @@
 					& Severe \\ \hline
 					Acute & Acute
 				\end{tabular}
-			\end{table}
-		
-		\subsection{Entire Program}
-			The entire program is disclosed by GitHub in \url{https://github.com/Fumire/Periodontist_Fall2019}. 
+			\end{table}			
     
     \section{Results}
     
