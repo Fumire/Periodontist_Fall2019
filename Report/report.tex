@@ -1,7 +1,7 @@
 % !TeX spellcheck = en_US
 % !TeX encoding = UTF-8
 \documentclass[aps, 11pt, a4paper]{article}
-\usepackage{graphics, graphicx, graphics}
+\usepackage{graphics, graphicx}
 \usepackage{fancyvrb, enumerate}
 \usepackage{amsmath, amssymb, amscd, amsfonts}
 \usepackage{geometry}
@@ -85,8 +85,8 @@
 			School & School of Electrical \& Computer Engineering \\ \hline
 			1 Track & Computer Science \& Engineering \\ \hline
 			2 Track & Bio-medical Engineering \\ \hline
-			Advisor 1 & Sungahn Ko \\ \hline
-			Advisor 2 & Semin Lee \\
+			Advisor 1 & Prof. Sungahn Ko \\ \hline
+			Advisor 2 & Prof. Semin Lee \\
 		\end{tabular}
     \end{table}
     \newpage
@@ -153,23 +153,35 @@
     			    			
     		\subsubsection{Seaborn}
 		   		\textit{Seaborn} is a Python data visualization library based on \textit{matplotlib}. It provides a high-level interface for drawing attractive and informative statistics graphics \cite{ref:seaborn1}.
-
     			
     	\subsection{Stages of Periodontitis}
-    		There are five clinical stages of periodontitis:
-    		\begin{enumerate}
-				\item Healthy
-				\item Slight
-				\item Moderate
-				\item Severe
-				\item Acute
-    		\end{enumerate}
+    		There are five clinical stages of periodontitis as table \ref{tb:stage}.
+    		
+			\begin{table}[htpb]
+				\centering
+				\caption{Clinical Stages of Periodontitis}
+				\label{tb:stage}
+				\begin{tabular}{cc}
+					Kinds & Stages \\ \hline \hline
+					Healthy & Healthy \\ \hline
+					\multirow{3}{*}{Chronic} & Slight \\
+					& Moderate \\
+					& Severe \\ \hline
+					Acute & Acute
+				\end{tabular}
+			\end{table}
+		
+		\subsection{Entire Program}
+			The entire program is disclosed by GitHub in \url{https://github.com/Fumire/Periodontist_Fall2019}. 
     
     \section{Results}
     
     \section{Discussion}
     
     \section{Acknowledgment}
+    	The relative study which based on the identical data has been submitted \textit{American Society for Microbiology} as "Prediction of chronic periodontitis severity using machine learning models based on salivary bacterial copy number". 
+    	
+    	I thank all study subjects for their generous participation and the clinicians for their contributions leading to the succesful completion of this study. This work was partly supported by the Technological Innovation R\&D Program (C0445482), funded by the Small and Medium business Administration (SMBA, Republic of Korea). This work also partly supported by the Next-Generation Information Computing Development Program of the National Research Foundation of Korea funded by the Ministry of Science and ICT (NRF-2016M3C4A7952635). This research work was also partly supported by the National Research Foundation (NRF) of Korea grant NRF-2017M3A9B6062026, funded by the government of Republic of Korea. I would like to thank David Whee-Young Choi for constructive criticism of the manuscript. 
     
     \addcontentsline{toc}{section}{References}
     \bibliographystyle{IEEEtran}
