@@ -107,7 +107,7 @@
     			\label{fig:depth}
     		\end{figure}
     	
-    		Periodontitis is diagnosed by measuring clinical attachment loss (CAL). Note that, the CAL is the length of the figure \ref{fig:depth}-1, which is sum of gingival recession (figure \ref{fig:depth}-2) and probing depth (figure \ref{fig:depth}-3).
+    		Periodontitis is diagnosed by measuring clinical attachment loss (CAL). Note that the CAL is the length of the figure \ref{fig:depth}-1, which is sum of gingival recession (figure \ref{fig:depth}-2) and probing depth (figure \ref{fig:depth}-3).
     		
     		Periodontitis is generally believed to be a result of a host-parasite interaction in which bacteria are the determinants of periodontitis \cite{ref:cause1}. In etiology, the primary cause of periodontitis is presumed as a bacterial infection as the primary cause of periodontitis \cite{ref:perio1}. Thus, the treatment of periodontitis includes antibiotics and dental surgery.
     		
@@ -119,11 +119,12 @@
     		If the feedback provides the correct answer for specific inputs, then learning problem is called supervised learning \cite{ref:ai1}. Classification is a kind of supervised learning for discrete values; regression is for continuous values.
     		
     	\subsection{Purpose of Research}
-    		There are many studies which have tried to find bacteria as bio-markers \cite{ref:biomarker1, ref:biomarker2}. However, many of these studies are about Western people, 
+    		There are many studies which have tried to find bacteria as bio-markers \cite{ref:biomarker1, ref:biomarker2}. 
     		
+    		Hence, the purposes of this research are as:
     		\begin{enumerate}
 				\item Classify the stage of periodontitis by oral bacteria.
-				\item Regress the CAL by oral bacteria. 
+				\item Regress the CAL, gingival recession, or probing depth by oral bacteria. 
     		\end{enumerate}
     
     \section{Materials}
@@ -132,14 +133,37 @@
     	\subsection{Python Packages}
     		Python programming language had been used to analyze data. Also, many Python modules had been adopted as hereinafter.
     		
+    		\subsubsection{Pandas}
+    		\textit{Pandas} is a Python library of rich data structures and tools for working with structured data sets common to statistics, finances, social sciences, and many other fields \cite{ref:pandas1}.
+    		
     		\subsubsection{Scikit-learn: Machine Learning in Python}
-    			\textit{Scikit-learn} is a Python module integrating a wide range of state-of-the-art machine learning algorithms for medium-scale supervised and unsupervised problems \cite{ref:sklearn1}.
-    			
+    			\textit{Scikit-learn} is a Python module integrating a wide range of state-of-the-art machine learning algorithms for medium-scale supervised and unsupervised problems \cite{ref:sklearn1}. Also, the following algorithms amongst \textit{Scikit-learn} package are used:
+    			\begin{itemize}
+					\item AdaBoost
+					\item Adam Neural Network
+					\item DecisionTree
+					\item K-Neighbors
+					\item LBFGS Neural Network
+					\item Linear SVC
+					\item Poly SVC
+					\item Random Forest
+					\item RBF SVC
+					\item Sigmoid SVC
+    			\end{itemize}
+    			    			
     		\subsubsection{Seaborn}
 		   		\textit{Seaborn} is a Python data visualization library based on \textit{matplotlib}. It provides a high-level interface for drawing attractive and informative statistics graphics \cite{ref:seaborn1}.
-    		
-    		\subsubsection{Pandas}
-    			\textit{Pandas} is a Python library of rich data structures and tools for working with structured data sets common to statistics, finances, social sciences, and many other fields \cite{ref:pandas1}.
+
+    			
+    	\subsection{Stages of Periodontitis}
+    		There are five clinical stages of periodontitis:
+    		\begin{enumerate}
+				\item Healthy
+				\item Slight
+				\item Moderate
+				\item Severe
+				\item Acute
+    		\end{enumerate}
     
     \section{Results}
     
