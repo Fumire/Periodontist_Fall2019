@@ -1,6 +1,6 @@
 % !TeX spellcheck = en_US
 % !TeX encoding = UTF-8
-\documentclass[aps, 10pt, a4paper]{article}
+\documentclass[aps, 11pt, a4paper]{article}
 \usepackage{graphics, graphicx, graphics}
 \usepackage{fancyvrb, enumerate}
 \usepackage{amsmath, amssymb, amscd, amsfonts}
@@ -10,6 +10,8 @@
 \usepackage{tikz}
 \usepackage{listings, listing}
 \usepackage{color}
+\usepackage{mathptmx}
+
 \usetikzlibrary{shapes, arrows, calc, positioning}
 \definecolor{codegreen}{rgb}{0, 0.6, 0}
 \definecolor{codegray}{rgb}{0.5, 0.5, 0.5}
@@ -69,12 +71,24 @@
     right = 20mm
 }
 
-\title{Prediction for Periodontist by Oral Bacteria}
-\author{Jaewoong Lee}
+\title{Prediction for Periodontists by Oral Bacteria in Korean\\ \large 2020 1st Semester Interdisciplinary Project}
+\author{20161206 JaewoongLee}
 \date{\today}
 
 \begin{document}
     \maketitle
+    \begin{table}[h]
+    	\centering
+		\begin{tabular}{c|c}
+			Student ID & 20161206 \\ \hline
+			Name & Jaewoong Lee \\ \hline
+			School & School of Electrical \& Computer Engineering \\ \hline
+			1 Track & Computer Science \& Engineering \\ \hline
+			2 Track & Bio-medical Engineering \\ \hline
+			Advisor 1 & Sungahn Ko \\ \hline
+			Advisor 2 & Semin Lee \\
+		\end{tabular}
+    \end{table}
     \newpage
     
     \tableofcontents
@@ -83,16 +97,45 @@
     \newpage
     
     \section{Introduction}
+    	\subsection{Periodontitis}
+    		Periodontitis is an inflammatory disease of the periodontium which is characterized by a progressive destruction of the tissues supporting the tooth \cite{ref:perio2}. In histopathologically, periodontitis may result periodontal pocketing, location of junctional epithelium apical to the cemento-enamal junction, loss of collagen fibers subjacent to the pocket epithelium, numerous poly-morphonuclear leukocytes in epithelium and a dense inflammatory cell infiltrate with plasma cells, lymphocytes, and macrophages \cite{ref:perio1}. Periodontits is currently assumed to progress as periodic, relatively short episodes of rapid tissue destruction followed by some prolonged intervening periods of disease remission \cite{ref:perio2}. 
+    		
+    		Periodontitis is generally believed to be a result of a host-parasite interaction in which bacteria are the determinants of periodontitis \cite{ref:cause1}. In etiology, the primary cause of periodontitis is presumed as a bacterial infection as the primary cause of periodontitis \cite{ref:perio1}. Thus, the treatment of periodontitis includes antibiotics and dental surgery.
+    		
+    		In this manner, some medicines have been introduced for treatment. However, the success in the prevention and treatment of periodontitis has been limited. Many \textit{in vitro} studies shows that Asian have the different bacteria from non-Asian, due to their groceries \cite{ref:asian1}. Thus, the developments of plaque and calculus in Asian differ, and may lead to distant reactions between Asian and non-Asian.
+    		
+    	\subsection{Machine Learning}
+    		Machine learning is the study of algorithms which advance spontaneously through experience. Machine learning is conjugated where is infeasible with conventional algorithms such as computer vision. Classification and regression will be used in this research. 
+    	
+    		\subsubsection{Classification}
+    		
+    		\subsubsection{Regression}
+    		
+    	\subsection{Purpose of Research}
+    		There are many studies which have tried to find bacteria as bio-markers \cite{ref:biomarker1, ref:biomarker2}. 
     
     \section{Materials}
     
     \section{Methods}
+    	\subsection{Python Packages}
+    		Python programming language had been used to analyze data. Also, many Python modules had been adopted as hereinafter.
+    		
+    		\subsubsection{Scikit-learn: Machine Learning in Python}
+    			\textit{Scikit-learn} is a Python module integrating a wide range of state-of-the-art machine learning algorithms for medium-scale supervised and unsupervised problems \cite{ref:sklearn1}.
+    			
+    		\subsubsection{Seaborn}
+		   		\textit{Seaborn} is a Python data visualization library based on \textit{matplotlib}. It provides a high-level interface for drawing attractive and informative statistics graphics \cite{ref:seaborn1}.
+    		
+    		\subsubsection{Pandas}
+    			\textit{Pandas} is a Python library of rich data structures and tools for working with structured data sets common to statistics, finances, social sciences, and many other fields \cite{ref:pandas1}.
     
     \section{Results}
     
     \section{Discussion}
     
+    \section{Acknowledgment}
+    
     \addcontentsline{toc}{section}{References}
-    \bibliographystyle{apalike}
+    \bibliographystyle{IEEEtran}
     \bibliography{reference}
 \end{document}
