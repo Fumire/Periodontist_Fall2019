@@ -121,13 +121,47 @@
     	\subsection{Purpose of Research}
     		There are many studies which have tried to find bacteria as bio-markers \cite{ref:biomarker1, ref:biomarker2}. Most of these papers, though, researched in Western people \cite{ref:west1, ref:west2}. As I mentioned herein-above, oral bacteria population may differ between Western and non-Western. In this approach, therefore, prediction periodontitis from machine learning which based on oral bacteria population of Korean is required. 
     		
-    		Hence, the purposes of this research are as:
+			I aimed to probe the performance of machine learning which predict the severity of periodontitis. Specifically, the purpose of this research is herein-after:
     		\begin{enumerate}
 				\item Classify the stage of periodontitis by oral bacteria.
 				\item Regress the CAL, the GR, or the PD by oral bacteria. 
     		\end{enumerate}
     
     \section{Materials}
+    	\subsection{Clinical Examinations}
+	    	This study included 784 samples from who visited the Department of Periodontics, Pusan National University Dental Hospital, between August 2016 and March 2019. The study protocol was approved by the Institutional Review Board of Pusan National University Dental Hospital (PNUDH-2016-019). All samples are provided written informed consent upon complete information regarding the objectives and procedures of this study.
+	    	
+	    	The diagnosis of samples was completed as \cite{ref:diagnosis1}. Also, the stage of periodontitis was categorized on the basis of the CAL as following:
+	    	\begin{itemize}
+				\item Slight: 1-2 mm
+				\item Moderate: 3-4 mm
+				\item Severe: $\geq$ 5 mm
+	    	\end{itemize}
+	    
+	    	Moreover, the following patients were excluded:
+	    	\begin{itemize}
+				\item who received periodontal treatment with past six months
+				\item who were pregnant or breastfeeding
+				\item who refused to approve the informed consent form
+	    	\end{itemize}
+	    
+	    	The CAL was measured with a periodontal probe (PGF-W, Osung, Kwangmyung, Republic of Korea) during the clinical evaluation. All measurement were performed by two fully-experienced periodontitsts.
+	    
+	    \subsection{Analysis of Bacterial Copy}
+	    	Collection of mouthwash sample and DAN extraction were performed as \cite{ref:DNA1}. Also, the nine pathogens were chosen as herein-after:
+	    	\begin{enumerate}
+				\item \textit{Porphyromonas gingivalis (Pg)}
+				\item \textit{Tannerella forsysthia (Tf)}
+				\item \textit{Treponema denticola (Td)}
+				\item \textit{Prevotella intermedia (Pi)}
+				\item \textit{Fusobacterium nucleatum (Fn)}
+				\item \textit{Campylobacter rectus (Cr)}
+				\item \textit{Aggregatibacter actinomycetemcomitans (Aa)}
+				\item \textit{Peptostreptococcus anaerobius (Pa)}
+				\item \textit{Eikenella corrodens (Ec)}
+	    	\end{enumerate}
+    	
+    		Multiplex qPCR system was optimized for the nine pathogens after the building of standard curves for each pathogen. 
     
     \section{Methods}
     	The entire program is disclosed by GitHub in \url{https://github.com/Fumire/Periodontist_Fall2019}. 
@@ -155,23 +189,46 @@
     			    			
     		\subsubsection{Seaborn}
 		   		\textit{Seaborn} is a Python data visualization library based on \textit{matplotlib}. It provides a high-level interface for drawing attractive and informative statistics graphics \cite{ref:seaborn1}.
-    			
-    	\subsection{Stages of Periodontitis}
-    		There are five clinical stages of periodontitis as table \ref{tb:stage}.
-    		
-			\begin{table}[htpb]
+		
+		\subsection{Confusion Matrix and Its Derivations}
+			A confusion matrix is a table which displays the performance of classification algorithm. Typically, the confusion matrix is like as table \ref{tb:confusion}.
+			
+			\begin{table}[htbp]
 				\centering
-				\caption{Clinical Stages of Periodontitis}
-				\label{tb:stage}
-				\begin{tabular}{cc}
-					Kinds & Stages \\ \hline \hline
-					Healthy & Healthy \\ \hline
-					\multirow{3}{*}{Chronic} & Slight \\
-					& Moderate \\
-					& Severe \\ \hline
-					Acute & Acute
+				\caption{Abstract Form of Confusion Matrix}
+				\label{tb:confusion}
+				\begin{tabular}{cc|cc}
+					\multicolumn{2}{c}{\multirow{2}{*}{}} & \multicolumn{2}{|c}{Actual Class} \\ \cline{3-4} 
+					\multicolumn{2}{c|}{} & Positive & Negative \\ \hline
+					\multicolumn{1}{c|}{\multirow{2}{*}{Predicted Class}} & Positive & True Positive & False Positive \\
+					\multicolumn{1}{c|}{} & Negative & False Negative & True Negative
 				\end{tabular}
-			\end{table}			
+			\end{table}
+			
+			Many derivations, such as sensitivity and specificity, come from the confusion matrix. The equation of derivations are followings:
+			\begin{itemize}
+				\item Sensitivity = $\frac{TP}{P}$
+				\item Specificity = $\frac{TN}{N}$
+				\item Precision = $\frac{TP}{TP + FP}$
+				\item Negative predictive value = $\frac{TN}{TN + FN}$
+				\item Miss rate = $\frac{FN}{P}$ = $\frac{FN}{FN + TP}$
+				\item False positive rate = $\frac{FP}{N}$ = $\frac{FP}{FP + TN}$
+				\item False discovery rate = $\frac{FP}{FP + TP}$
+				\item False omission rate = $\frac{FN}{FN + TN}$
+				\item Threat score = $\frac{TP}{TP + FN + FP}$
+				\item Accuracy = $\frac{TP+TN}{P + N}$
+				\item F1 score = $\frac{2TP}{2TP + FP + FN}$
+			\end{itemize}
+			
+			Note that followed abbreviations are used:
+			\begin{itemize}
+				\item P: Positive
+				\item N: Negative
+				\item TP: True Positive
+				\item TN: True Negative
+				\item FP: False Positive
+				\item FN: False Negative
+			\end{itemize}
     
     \section{Results}
     
