@@ -261,39 +261,39 @@
     
     \section{Results}
     	\subsection{5-class Classification}
-    		Figure \ref{fig:5-confusion} displays the derivations of confusion matrix in multi-class classification. Note that the values in figure \ref{fig:5-confusion}, mean values from combinations which used same number of features will be shown. 
+    		Figure \ref{fig:5-confusion} displays the derivations of confusion matrix in 5-class classification. Note that the values in figure \ref{fig:5-confusion}, mean values from combinations which used same number of features will be shown. 
     		\begin{figure}[htbp]
 				\centering
 				$\begin{array}{ccc}
-					\includegraphics[width=0.3 \linewidth]{figures/Multi-class/accuracy.png}
+					\includegraphics[width=0.3 \linewidth]{figures/5-class/accuracy.png}
 					&
-					\includegraphics[width=0.3 \linewidth]{figures/Multi-class/F1_score.png}
+					\includegraphics[width=0.3 \linewidth]{figures/5-class/F1_score.png}
 					&
-					\includegraphics[width=0.3 \linewidth]{figures/Multi-class/fall_out.png}
+					\includegraphics[width=0.3 \linewidth]{figures/5-class/fall_out.png}
 					\\
 					\mbox{Accuracy} & \mbox{F1 score} & \mbox{Fall-out} \\
 					
-					\includegraphics[width=0.3 \linewidth]{figures/Multi-class/false_discovery_rate.png}
+					\includegraphics[width=0.3 \linewidth]{figures/5-class/false_discovery_rate.png}
 					&
-					\includegraphics[width=0.3 \linewidth]{figures/Multi-class/false_ommission_rate.png}
+					\includegraphics[width=0.3 \linewidth]{figures/5-class/false_ommission_rate.png}
 					&
-					\includegraphics[width=0.3 \linewidth]{figures/Multi-class/miss_rate.png}
+					\includegraphics[width=0.3 \linewidth]{figures/5-class/miss_rate.png}
 					\\
 					\mbox{False discovery rate} & \mbox{False ommision rate} & \mbox{Miss rate} \\ 
 					
-					\includegraphics[width=0.3 \linewidth]{figures/Multi-class/negative_predictive_value.png}
+					\includegraphics[width=0.3 \linewidth]{figures/5-class/negative_predictive_value.png}
 					&
-					\includegraphics[width=0.3 \linewidth]{figures/Multi-class/odds_ratio.png}
+					\includegraphics[width=0.3 \linewidth]{figures/5-class/odds_ratio.png}
 					&
-					\includegraphics[width=0.3 \linewidth]{figures/Multi-class/precision.png}
+					\includegraphics[width=0.3 \linewidth]{figures/5-class/precision.png}
 					\\
 					\mbox{Negative predictive value} & \mbox{Odds ratio} & \mbox{Precision} \\ 
 					
-					\includegraphics[width=0.3 \linewidth]{figures/Multi-class/sensitivity.png}
+					\includegraphics[width=0.3 \linewidth]{figures/5-class/sensitivity.png}
 					&
-					\includegraphics[width=0.3 \linewidth]{figures/Multi-class/specificity.png}
+					\includegraphics[width=0.3 \linewidth]{figures/5-class/specificity.png}
 					&
-					\includegraphics[width=0.3 \linewidth]{figures/Multi-class/thread_score.png}
+					\includegraphics[width=0.3 \linewidth]{figures/5-class/thread_score.png}
 					\\
 					\mbox{Sensitivity} & \mbox{Specificity} & \mbox{Thread score} \\
 				\end{array}$
@@ -305,15 +305,14 @@
     		
     		\begin{figure}[htbp]
 				\centering
-				\includegraphics[width=0.5 \linewidth]{figures/Multi-class/heatmap.png}
+				\includegraphics[width=0.5 \linewidth]{figures/5-class/heatmap.png}
 				\caption{Heatmap Plot 5-class Classification with Poly-SVC}
 				\label{fig:5-heatmap}
     		\end{figure}
     	
-    		Figure \ref{fig:5-heatmap} shows the heatmap between real and predicted classes.
+    		Figure \ref{fig:5-heatmap} shows the heatmap between real and predicted classes. As shown as figure \ref{fig:5-confusion}, the accuracy is over 80 \%, and wrong predicted class is predicted neighbor class; for instance, healthy and moderate class are neighbor class of slight class. Moreover, acute class is commonly classified as moderate and severe class. 
     		
     	\subsection{4-class Classification}
-    		\subsubsection{Healthy-Slight Class}
     	
     	\subsection{Regression}
     
