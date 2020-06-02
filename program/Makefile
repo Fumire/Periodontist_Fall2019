@@ -89,4 +89,6 @@ $(RESULTS_DIRECTORY)/Regression-AL/statistics.csv: regression.py $(RESULTS_DIREC
 $(RESULTS_DIRECTORY)/Regression-PD/statistics.csv: regression.py $(RESULTS_DIRECTORY)/csv/default.csv
 	$(PYTHON3) $(abspath $(filter %.py,$^)) --input_file $(filter %.csv,$^) --output_dir $(dir $@) --column PD --jobs $(JOBS)
 
-latest: CLASS_RUN
+REGRESSOR_RUN: $(RESULTS_DIRECTORY)/depth/scatter.png $(RESULTS_DIRECTORY)/depth/violin_AL.png $(RESULTS_DIRECTORY)/depth/violin_PD.png $(RESULTS_DIRECTORY)/Regression-AL/statistics.csv $(RESULTS_DIRECTORY)/Regression-PD/statistics.csv
+
+latest: REGRESSOR_RUN
