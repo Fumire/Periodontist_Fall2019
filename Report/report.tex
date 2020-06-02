@@ -511,7 +511,7 @@
     			\end{figure}
     		
     		\subsubsection{Merged Moderate-Acute Class}
-    			Figure \ref{fig:m-a-confusion} displays the derivations of confusion matrix in merged moderate-acute classification. Note that the values in figure \ref{fig:m-a-confusion}, mean values from combination which used same number of features will be shown. As figure \ref{fig:m-a-confusion}, the Random Forest algorithm as the best values with all features. Thus, the heatmap plot with real and predicted classes is shown as figure \ref{fig:m-a-heatmap}.
+    			Figure \ref{fig:m-a-confusion} displays the derivations of confusion matrix in merged moderate-acute classification. Note that the values in figure \ref{fig:m-a-confusion}, mean values from combination which used same number of features will be shown. As figure \ref{fig:m-a-confusion}, the Random Forest algorithm has the best values with all features. Thus, the heatmap plot with real and predicted classes is shown as figure \ref{fig:m-a-heatmap}.
     		
     			\begin{figure}[htbp]
     				\centering
@@ -560,6 +560,53 @@
     			\end{figure}
     		
     		\subsubsection{Merged Severe-Acute Class}
+    			Figure \ref{fig:s-a-confusion} displays the derivations of confusion matrix in merged severe-acute classification. Note that the values in figure \ref{fig:s-a-confusion}, mean values from combination which used same number of features will be shown. As figure \ref{fig:s-a-confusion}, the RBF-SVC algorithm has the best values with all features. Thus, the heatmap plot with real and predicted classes is shows as figure \ref{fig:s-a-heatmap}.
+    			
+    			\begin{figure}[htbp]
+    				\centering
+    				$\begin{array}{ccc}
+	    				\includegraphics[width=0.3 \linewidth]{figures/Severe-Acute/accuracy.png}
+	    				&
+	    				\includegraphics[width=0.3 \linewidth]{figures/Severe-Acute/F1_score.png}
+	    				&
+	    				\includegraphics[width=0.3 \linewidth]{figures/Severe-Acute/fall_out.png}
+	    				\\
+	    				\mbox{Accuracy} & \mbox{F1 score} & \mbox{Fall-out} \\
+	    				
+	    				\includegraphics[width=0.3 \linewidth]{figures/Severe-Acute/false_discovery_rate.png}
+	    				&
+	    				\includegraphics[width=0.3 \linewidth]{figures/Severe-Acute/false_ommission_rate.png}
+	    				&
+	    				\includegraphics[width=0.3 \linewidth]{figures/Severe-Acute/miss_rate.png}
+	    				\\
+	    				\mbox{False discovery rate} & \mbox{False ommision rate} & \mbox{Miss rate} \\ 
+	    				
+	    				\includegraphics[width=0.3 \linewidth]{figures/Severe-Acute/negative_predictive_value.png}
+	    				&
+	    				\includegraphics[width=0.3 \linewidth]{figures/Severe-Acute/odds_ratio.png}
+	    				&
+	    				\includegraphics[width=0.3 \linewidth]{figures/Severe-Acute/precision.png}
+	    				\\
+	    				\mbox{Negative predictive value} & \mbox{Odds ratio} & \mbox{Precision} \\ 
+	    				
+	    				\includegraphics[width=0.3 \linewidth]{figures/Severe-Acute/sensitivity.png}
+	    				&
+	    				\includegraphics[width=0.3 \linewidth]{figures/Severe-Acute/specificity.png}
+	    				&
+	    				\includegraphics[width=0.3 \linewidth]{figures/Severe-Acute/thread_score.png}
+	    				\\
+	    				\mbox{Sensitivity} & \mbox{Specificity} & \mbox{Thread score} \\
+	    			\end{array}$
+	    			\caption{Confusion Matrix Derivations from Severe-Acute Classification}
+	    			\label{fig:s-a-confusion}
+    			\end{figure}
+    		
+    			\begin{figure}[htbp]
+    				\centering
+    				\includegraphics[width=0.5 \linewidth]{figures/Severe-Acute/heatmap.png}
+    				\caption{Heatmap Plot for Merged Severe-Acute Classification with Random Forest}
+    				\label{fig:s-a-heatmap}
+    			\end{figure}
     	
     	\subsection{Regression}
     
