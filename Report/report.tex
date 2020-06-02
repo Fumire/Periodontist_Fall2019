@@ -315,7 +315,7 @@
     		
     	\subsection{4-class Classification}
     		\subsubsection{Merged Healthy-Slight Class}
-    			Figure \ref{fig:h-sli-confusion} displays the derivations of confusion matrix in merged healthy-slight classification. Note that the values in figure \ref{fig:h-sli-confusion}, mean values from combination which used same number of features will be shown. 
+    			Figure \ref{fig:h-sli-confusion} displays the derivations of confusion matrix in merged healthy-slight classification. Note that the values in figure \ref{fig:h-sli-confusion}, mean values from combination which used same number of features will be shown. As figure \ref{fig:h-sli-confusion}, the Random Forest algorithm has the best values with all features. 
     			
 	    		\begin{figure}[htbp]
     				\centering
@@ -355,8 +355,6 @@
 	    			\caption{Confusion Matrix Derivations from Merged Healthy-Slight Classification}
 	    			\label{fig:h-sli-confusion}
     			\end{figure}
-    		
-    			As figure \ref{fig:h-sli-confusion}, the Random Forest algorithm has the best values with all features. 
     			
     			\begin{figure}[htbp]
     				\centering
@@ -366,7 +364,7 @@
     			\end{figure}
     		
     		\subsubsection{Merged Slight-Moderate Class}
-    			Figure \ref{fig:sli-m-confusion} displays the derivations of confusion matrix in merged slight-moderate classification. Note that the values in figure \ref{fig:sli-m-confusion}, mean values from combination which used same number of features will be shown. 
+    			Figure \ref{fig:sli-m-confusion} displays the derivations of confusion matrix in merged slight-moderate classification. Note that the values in figure \ref{fig:sli-m-confusion}, mean values from combination which used same number of features will be shown. As figure \ref{fig:sli-m-confusion}, the K-Neighbor algorithm has the best values with all features.
     			
 			   	\begin{figure}[htbp]
     				\centering
@@ -407,8 +405,6 @@
 	    			\label{fig:sli-m-confusion}
     			\end{figure}
     		
-    			As figure \ref{fig:sli-m-confusion}, the K-Neighbor algorithm has the best values with all features.
-    		
 				\begin{figure}[htbp]
 					\centering
 					\includegraphics[width=0.5 \linewidth]{figures/Slight-Moderate/heatmap.png}
@@ -417,7 +413,7 @@
 				\end{figure}
     		
     		\subsubsection{Merged Moderate-Severe Class}
-    			Figure \ref{fig:m-s-confusion} displays the derivations of confusion matrix in merged moderate-severe classification. Note that the values in figure \ref{fig:m-s-confusion}, mean values from combination which used same number of features will be shown. 
+    			Figure \ref{fig:m-s-confusion} displays the derivations of confusion matrix in merged moderate-severe classification. Note that the values in figure \ref{fig:m-s-confusion}, mean values from combination which used same number of features will be shown. As figure \ref{fig:m-s-confusion}, the Random Forest algorithm has the best values with all features.
     		
     			\begin{figure}[htbp]
     				\centering
@@ -457,8 +453,6 @@
 	    			\caption{Confusion Matrix Derivations from Moderate-Severe Classification}
 	    			\label{fig:m-s-confusion}
     			\end{figure}
-    		
-    			As figure \ref{fig:m-s-confusion}, the Random Forest algorithm has the best values with all features.
     			
     			\begin{figure}[htbp]
     				\centering
@@ -468,6 +462,53 @@
     			\end{figure}
     		
     		\subsubsection{Merged Slight-Acute Class}
+    			Figure \ref{fig:sli-a-confusion} displays the derivations of confusion matrix in merged slight-acute classification. Note that the values in figure \ref{fig:sli-a-confusion}, mean values from combination which used same number of features will be shown. As figure \ref{fig:sli-a-heatmap}, the Random Forest algorithm as the best values with all features. 
+    		
+    			\begin{figure}[htbp]
+    				\centering
+    				$\begin{array}{ccc}
+	    				\includegraphics[width=0.3 \linewidth]{figures/Slight-Acute/accuracy.png}
+	    				&
+	    				\includegraphics[width=0.3 \linewidth]{figures/Slight-Acute/F1_score.png}
+	    				&
+	    				\includegraphics[width=0.3 \linewidth]{figures/Slight-Acute/fall_out.png}
+	    				\\
+	    				\mbox{Accuracy} & \mbox{F1 score} & \mbox{Fall-out} \\
+	    				
+	    				\includegraphics[width=0.3 \linewidth]{figures/Slight-Acute/false_discovery_rate.png}
+	    				&
+	    				\includegraphics[width=0.3 \linewidth]{figures/Slight-Acute/false_ommission_rate.png}
+	    				&
+	    				\includegraphics[width=0.3 \linewidth]{figures/Slight-Acute/miss_rate.png}
+	    				\\
+	    				\mbox{False discovery rate} & \mbox{False ommision rate} & \mbox{Miss rate} \\ 
+	    				
+	    				\includegraphics[width=0.3 \linewidth]{figures/Slight-Acute/negative_predictive_value.png}
+	    				&
+	    				\includegraphics[width=0.3 \linewidth]{figures/Slight-Acute/odds_ratio.png}
+	    				&
+	    				\includegraphics[width=0.3 \linewidth]{figures/Slight-Acute/precision.png}
+	    				\\
+	    				\mbox{Negative predictive value} & \mbox{Odds ratio} & \mbox{Precision} \\ 
+	    				
+	    				\includegraphics[width=0.3 \linewidth]{figures/Slight-Acute/sensitivity.png}
+	    				&
+	    				\includegraphics[width=0.3 \linewidth]{figures/Slight-Acute/specificity.png}
+	    				&
+	    				\includegraphics[width=0.3 \linewidth]{figures/Slight-Acute/thread_score.png}
+	    				\\
+	    				\mbox{Sensitivity} & \mbox{Specificity} & \mbox{Thread score} \\
+	    			\end{array}$
+	    			\caption{Confusion Matrix Derivations from Slight-Acute Classification}
+	    			\label{fig:sli-a-confusion}
+    			\end{figure}
+    		
+    			\begin{figure}[htbp]
+    				\centering
+    				\includegraphics[width=0.5 \linewidth]{figures/Slight-Acute/heatmap.png}
+    				\caption{Heatmap Plot for Merged Slight-Acute Classification with Random Forest}
+    				\label{fig:sli-a-heatmap}
+    			\end{figure}
     		
     		\subsubsection{Merged Moderate-Acute Class}
     		
