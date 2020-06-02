@@ -257,7 +257,46 @@
 				These are almost every algorithm which are supported by \textit{Scikit-learn}.
     
     \section{Results}
-    	\subsection{Classification}
+    	\subsection{Multi-class Classification}
+    		Figure \ref{fig:multi-confusion} displays the derivations of confusion matrix in multi-class classification. 
+    		\begin{figure}[htbp]
+				\centering
+				$\begin{array}{ccc}
+					\includegraphics[width=0.3 \linewidth]{figures/Multi-class/accuracy.png}
+					&
+					\includegraphics[width=0.3 \linewidth]{figures/Multi-class/F1_score.png}
+					&
+					\includegraphics[width=0.3 \linewidth]{figures/Multi-class/fall_out.png}
+					\\
+					\mbox{Accuracy} & \mbox{F1 score} & \mbox{Fall-out} \\
+					
+					\includegraphics[width=0.3 \linewidth]{figures/Multi-class/false_discovery_rate.png}
+					&
+					\includegraphics[width=0.3 \linewidth]{figures/Multi-class/false_ommission_rate.png}
+					&
+					\includegraphics[width=0.3 \linewidth]{figures/Multi-class/miss_rate.png}
+					\\
+					\mbox{False discovery rate} & \mbox{False ommision rate} & \mbox{Miss rate} \\ 
+					
+					\includegraphics[width=0.3 \linewidth]{figures/Multi-class/negative_predictive_value.png}
+					&
+					\includegraphics[width=0.3 \linewidth]{figures/Multi-class/odds_ratio.png}
+					&
+					\includegraphics[width=0.3 \linewidth]{figures/Multi-class/precision.png}
+					\\
+					\mbox{Negative predictive value} & \mbox{Odds ratio} & \mbox{Precision} \\ 
+					
+					\includegraphics[width=0.3 \linewidth]{figures/Multi-class/sensitivity.png}
+					&
+					\includegraphics[width=0.3 \linewidth]{figures/Multi-class/specificity.png}
+					&
+					\includegraphics[width=0.3 \linewidth]{figures/Multi-class/thread_score.png}
+					\\
+					\mbox{Sensitivity} & \mbox{Specificity} & \mbox{Thread score} \\
+				\end{array}$
+				\caption{Confusion Matrix Derivations from Multi-class Classification}
+				\label{fig:multi-confusion}
+    		\end{figure}
     	
     	\subsection{Regression}
     
