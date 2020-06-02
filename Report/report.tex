@@ -366,6 +366,55 @@
     			\end{figure}
     		
     		\subsubsection{Merged Slight-Moderate Class}
+    			Figure \ref{fig:sli-m-confusion} displays the derivations of confusion matrix in merged slight-moderate classification. Note that the values in figure \ref{fig:sli-m-confusion}, mean values from combination which used same number of features will be shown. 
+    			
+			   	\begin{figure}[htbp]
+    				\centering
+    				$\begin{array}{ccc}
+	    				\includegraphics[width=0.3 \linewidth]{figures/Slight-Moderate/accuracy.png}
+	    				&
+	    				\includegraphics[width=0.3 \linewidth]{figures/Slight-Moderate/F1_score.png}
+	    				&
+	    				\includegraphics[width=0.3 \linewidth]{figures/Slight-Moderate/fall_out.png}
+	    				\\
+	    				\mbox{Accuracy} & \mbox{F1 score} & \mbox{Fall-out} \\
+	    				
+	    				\includegraphics[width=0.3 \linewidth]{figures/Slight-Moderate/false_discovery_rate.png}
+	    				&
+	    				\includegraphics[width=0.3 \linewidth]{figures/Slight-Moderate/false_ommission_rate.png}
+	    				&
+	    				\includegraphics[width=0.3 \linewidth]{figures/Slight-Moderate/miss_rate.png}
+	    				\\
+	    				\mbox{False discovery rate} & \mbox{False ommision rate} & \mbox{Miss rate} \\ 
+	    				
+	    				\includegraphics[width=0.3 \linewidth]{figures/Slight-Moderate/negative_predictive_value.png}
+	    				&
+	    				\includegraphics[width=0.3 \linewidth]{figures/Slight-Moderate/odds_ratio.png}
+	    				&
+	    				\includegraphics[width=0.3 \linewidth]{figures/Slight-Moderate/precision.png}
+	    				\\
+	    				\mbox{Negative predictive value} & \mbox{Odds ratio} & \mbox{Precision} \\ 
+	    				
+	    				\includegraphics[width=0.3 \linewidth]{figures/Slight-Moderate/sensitivity.png}
+	    				&
+	    				\includegraphics[width=0.3 \linewidth]{figures/Slight-Moderate/specificity.png}
+	    				&
+	    				\includegraphics[width=0.3 \linewidth]{figures/Slight-Moderate/thread_score.png}
+	    				\\
+	    				\mbox{Sensitivity} & \mbox{Specificity} & \mbox{Thread score} \\
+	    			\end{array}$
+    			\caption{Confusion Matrix Derivations from Slight-Moderate Classification}
+    			\label{fig:sli-m-confusion}
+    			\end{figure}
+    		
+    			As figure \ref{fig:sli-m-confusion}, the K-Neighbor algorithm has the best values with all features.
+    		
+				\begin{figure}[htbp]
+					\centering
+					\includegraphics[width=0.5 \linewidth]{figures/Slight-Moderate/heatmap.png}
+					\caption{Heatmap Plot for Merged Slight-Moderate Classification with Random Forest}
+					\label{fig:sli-m-heatmap}
+				\end{figure}
     		
     		\subsubsection{Merged Moderate-Severe Class}
     		
