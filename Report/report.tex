@@ -133,6 +133,7 @@
 	    	
 	    	The diagnosis of samples was completed as \cite{ref:diagnosis1}. Also, the stage of periodontitis was categorized on the basis of the CAL as following:
 	    	\begin{itemize}
+	    		\item Healthy: $\leq$ 1mm
 				\item Slight: 1-2 mm
 				\item Moderate: 3-4 mm
 				\item Severe: $\geq$ 5 mm
@@ -173,62 +174,67 @@
     		\textit{Pandas} is a Python library of rich data structures and tools for working with structured data sets common to statistics, finances, social sciences, and many other fields \cite{ref:pandas1}.
     		
     		\subsubsection{Scikit-learn: Machine Learning in Python}
-    			\textit{Scikit-learn} is a Python module integrating a wide range of state-of-the-art machine learning algorithms for medium-scale supervised and unsupervised problems \cite{ref:sklearn1}. Also, the following algorithms amongst \textit{Scikit-learn} package are used:
-    			\begin{itemize}
-					\item AdaBoost
-					\item Adam Neural Network
-					\item DecisionTree
-					\item K-Neighbors
-					\item LBFGS Neural Network
-					\item Linear SVC
-					\item Poly SVC
-					\item Random Forest
-					\item RBF SVC
-					\item Sigmoid SVC
-    			\end{itemize}
+    			\textit{Scikit-learn} is a Python module integrating a wide range of state-of-the-art machine learning algorithms for medium-scale supervised and unsupervised problems \cite{ref:sklearn1}.``
     			    			
     		\subsubsection{Seaborn}
 		   		\textit{Seaborn} is a Python data visualization library based on \textit{matplotlib}. It provides a high-level interface for drawing attractive and informative statistics graphics \cite{ref:seaborn1}.
 		
-		\subsection{Confusion Matrix and Its Derivations}
-			A confusion matrix is a table which displays the performance of classification algorithm. Typically, the confusion matrix is like as table \ref{tb:confusion}.
-			
-			\begin{table}[htbp]
-				\centering
-				\caption{Abstract Form of Confusion Matrix}
-				\label{tb:confusion}
-				\begin{tabular}{cc|cc}
-					\multicolumn{2}{c}{\multirow{2}{*}{}} & \multicolumn{2}{|c}{Actual Class} \\ \cline{3-4} 
-					\multicolumn{2}{c|}{} & Positive & Negative \\ \hline
-					\multicolumn{1}{c|}{\multirow{2}{*}{Predicted Class}} & Positive & True Positive & False Positive \\
-					\multicolumn{1}{c|}{} & Negative & False Negative & True Negative
-				\end{tabular}
-			\end{table}
-			
-			Many derivations, such as sensitivity and specificity, come from the confusion matrix. The equation of derivations are followings:
-			\begin{itemize}
-				\item Sensitivity = $\frac{TP}{P}$
-				\item Specificity = $\frac{TN}{N}$
-				\item Precision = $\frac{TP}{TP + FP}$
-				\item Negative predictive value = $\frac{TN}{TN + FN}$
-				\item Miss rate = $\frac{FN}{P}$ = $\frac{FN}{FN + TP}$
-				\item False positive rate = $\frac{FP}{N}$ = $\frac{FP}{FP + TN}$
-				\item False discovery rate = $\frac{FP}{FP + TP}$
-				\item False omission rate = $\frac{FN}{FN + TN}$
-				\item Threat score = $\frac{TP}{TP + FN + FP}$
-				\item Accuracy = $\frac{TP+TN}{P + N}$
-				\item F1 score = $\frac{2TP}{2TP + FP + FN}$
-			\end{itemize}
-			
-			Note that followed abbreviations are used:
-			\begin{itemize}
-				\item P: Positive
-				\item N: Negative
-				\item TP: True Positive
-				\item TN: True Negative
-				\item FP: False Positive
-				\item FN: False Negative
-			\end{itemize}
+			\subsection{Classification}
+				\subsubsection{Confusion Matrix and Its Derivations}
+					A confusion matrix is a table which displays the performance of classification algorithm. Typically, the confusion matrix is like as table \ref{tb:confusion}.
+					
+					\begin{table}[htbp]
+						\centering
+						\caption{Abstract Form of Confusion Matrix}
+						\label{tb:confusion}
+						\begin{tabular}{cc|cc}
+							\multicolumn{2}{c}{\multirow{2}{*}{}} & \multicolumn{2}{|c}{Actual Class} \\ \cline{3-4} 
+							\multicolumn{2}{c|}{} & Positive & Negative \\ \hline
+							\multicolumn{1}{c|}{\multirow{2}{*}{Predicted Class}} & Positive & True Positive & False Positive \\
+							\multicolumn{1}{c|}{} & Negative & False Negative & True Negative
+						\end{tabular}
+					\end{table}
+					
+					Many derivations, such as sensitivity and specificity, come from the confusion matrix. The equation of derivations are followings:
+					\begin{itemize}
+						\item Sensitivity = $\frac{TP}{P}$
+						\item Specificity = $\frac{TN}{N}$
+						\item Precision = $\frac{TP}{TP + FP}$
+						\item Negative predictive value = $\frac{TN}{TN + FN}$
+						\item Miss rate = $\frac{FN}{P}$ = $\frac{FN}{FN + TP}$
+						\item False positive rate = $\frac{FP}{N}$ = $\frac{FP}{FP + TN}$
+						\item False discovery rate = $\frac{FP}{FP + TP}$
+						\item False omission rate = $\frac{FN}{FN + TN}$
+						\item Threat score = $\frac{TP}{TP + FN + FP}$
+						\item Accuracy = $\frac{TP+TN}{P + N}$
+						\item F1 score = $\frac{2TP}{2TP + FP + FN}$
+					\end{itemize}
+					
+					Note that followed abbreviations are used:
+					\begin{itemize}
+						\item P: Positive
+						\item N: Negative
+						\item TP: True Positive
+						\item TN: True Negative
+						\item FP: False Positive
+						\item FN: False Negative
+					\end{itemize}
+				
+			\subsubsection{Classification Algoritm}
+				For classification, the followed algorithms has been used:
+				\begin{itemize}
+					\item K-Neighbors
+					\item Linear Support Vector Classification (SVC)
+					\item Poly SVC
+					\item RBF SVC
+					\item Sigmoid SVC
+					\item Decision Tree
+					\item Random Forest
+					\item Adam Neural Network (NN)
+					\item lbfgs NN
+					\item Ada-Boost
+				\end{itemize}
+				These are almost every algorithm which are supported by \textit{Sci-kit Learn}.
     
     \section{Results}
     
