@@ -180,6 +180,8 @@
 		   		\textit{Seaborn} is a Python data visualization library based on \textit{matplotlib}. It provides a high-level interface for drawing attractive and informative statistics graphics \cite{ref:seaborn1}.
 		
 			\subsection{Classification}
+				In classification, every combination of the nine pathogens, $2^9 = 512$ combinations, will be used. Also, in classification, some classes are merged into new class. For instance, healthy class and slight class could be merged, then the algorithm will be performed with four classes. As the pathogen combination, every combination of merging classes will be finished. 
+				
 				\subsubsection{Confusion Matrix and Its Derivations}
 					A confusion matrix is a table which displays the performance of classification algorithm. Typically, the confusion matrix is like as table \ref{tb:confusion}.
 					
@@ -237,6 +239,7 @@
 				These are almost every algorithm which are supported by \textit{Scikit-learn}.
 				
 		\subsection{Regression}
+			In regression, every combination of the nine pathogens, $2^9 = 512$ combinations, will be used. 
 			\subsubsection{Coefficient of Determination}
 				Coefficient of determination, also known as $R^2$ or R-square, is common to use as an index of the size of the relation \cite{ref:rsquare1}. 
 				
@@ -257,8 +260,8 @@
 				These are almost every algorithm which are supported by \textit{Scikit-learn}.
     
     \section{Results}
-    	\subsection{Multi-class Classification}
-    		Figure \ref{fig:multi-confusion} displays the derivations of confusion matrix in multi-class classification. 
+    	\subsection{5-class Classification}
+    		Figure \ref{fig:5-confusion} displays the derivations of confusion matrix in multi-class classification. Note that the values in figure \ref{fig:5-confusion}, mean values from combinations which used same number of features will be shown. 
     		\begin{figure}[htbp]
 				\centering
 				$\begin{array}{ccc}
@@ -294,9 +297,23 @@
 					\\
 					\mbox{Sensitivity} & \mbox{Specificity} & \mbox{Thread score} \\
 				\end{array}$
-				\caption{Confusion Matrix Derivations from Multi-class Classification}
-				\label{fig:multi-confusion}
+				\caption{Confusion Matrix Derivations from 5-class Classification}
+				\label{fig:5-confusion}
     		\end{figure}
+    	
+    		As figure \ref{fig:5-confusion}, the Poly-SVC algorithm has the best values with all features. 
+    		
+    		\begin{figure}[htbp]
+				\centering
+				\includegraphics[width=0.5 \linewidth]{figures/Multi-class/heatmap.png}
+				\caption{Heatmap Plot 5-class Classification with Poly-SVC}
+				\label{fig:5-heatmap}
+    		\end{figure}
+    	
+    		Figure \ref{fig:5-heatmap} shows the heatmap between real and predicted classes.
+    		
+    	\subsection{4-class Classification}
+    		\subsubsection{Healthy-Slight Class}
     	
     	\subsection{Regression}
     
