@@ -262,6 +262,7 @@
     \section{Results}
     	\subsection{5-class Classification}
     		Figure \ref{fig:5-confusion} displays the derivations of confusion matrix in 5-class classification. Note that the values in figure \ref{fig:5-confusion}, mean values from combinations which used same number of features will be shown. 
+    		
     		\begin{figure}[htbp]
 				\centering
 				$\begin{array}{ccc}
@@ -306,13 +307,73 @@
     		\begin{figure}[htbp]
 				\centering
 				\includegraphics[width=0.5 \linewidth]{figures/5-class/heatmap.png}
-				\caption{Heatmap Plot 5-class Classification with Poly-SVC}
+				\caption{Heatmap Plot for 5-class Classification with Poly-SVC}
 				\label{fig:5-heatmap}
     		\end{figure}
     	
     		Figure \ref{fig:5-heatmap} shows the heatmap between real and predicted classes. As shown as figure \ref{fig:5-confusion}, the accuracy is over 80 \%, and wrong predicted class is predicted neighbor class; for instance, healthy and moderate class are neighbor class of slight class. Moreover, acute class is commonly classified as moderate and severe class. 
     		
     	\subsection{4-class Classification}
+    		\subsubsection{Merged Healthy-Slight Class}
+    			Figure \ref{fig:h-sli-confusion} displays the derivations of confusion matrix in merged healthy-slight classification. Note that the values in figure \ref{fig:h-sli-confusion}, mean values from combination which used same number of features will be shown. 
+    			
+	    		\begin{figure}[htbp]
+    				\centering
+	    				$\begin{array}{ccc}
+	    				\includegraphics[width=0.3 \linewidth]{figures/Healthy-Slight/accuracy.png}
+	    				&
+	    				\includegraphics[width=0.3 \linewidth]{figures/Healthy-Slight/F1_score.png}
+	    				&
+	    				\includegraphics[width=0.3 \linewidth]{figures/Healthy-Slight/fall_out.png}
+	    				\\
+	    				\mbox{Accuracy} & \mbox{F1 score} & \mbox{Fall-out} \\
+	    				
+	    				\includegraphics[width=0.3 \linewidth]{figures/Healthy-Slight/false_discovery_rate.png}
+	    				&
+	    				\includegraphics[width=0.3 \linewidth]{figures/Healthy-Slight/false_ommission_rate.png}
+	    				&
+	    				\includegraphics[width=0.3 \linewidth]{figures/Healthy-Slight/miss_rate.png}
+	    				\\
+	    				\mbox{False discovery rate} & \mbox{False ommision rate} & \mbox{Miss rate} \\ 
+	    				
+	    				\includegraphics[width=0.3 \linewidth]{figures/Healthy-Slight/negative_predictive_value.png}
+	    				&
+	    				\includegraphics[width=0.3 \linewidth]{figures/Healthy-Slight/odds_ratio.png}
+	    				&
+	    				\includegraphics[width=0.3 \linewidth]{figures/Healthy-Slight/precision.png}
+	    				\\
+	    				\mbox{Negative predictive value} & \mbox{Odds ratio} & \mbox{Precision} \\ 
+	    				
+	    				\includegraphics[width=0.3 \linewidth]{figures/Healthy-Slight/sensitivity.png}
+	    				&
+	    				\includegraphics[width=0.3 \linewidth]{figures/Healthy-Slight/specificity.png}
+	    				&
+	    				\includegraphics[width=0.3 \linewidth]{figures/Healthy-Slight/thread_score.png}
+	    				\\
+	    				\mbox{Sensitivity} & \mbox{Specificity} & \mbox{Thread score} \\
+	    			\end{array}$
+	    			\caption{Confusion Matrix Derivations from Merged Healthy-Slight Classification}
+	    			\label{fig:h-sli-confusion}
+    			\end{figure}
+    		
+    			As figure \ref{fig:h-sli-confusion}, the Random Forest algorithm has the best values with all features. 
+    			
+    			\begin{figure}[htbp]
+    				\centering
+					\includegraphics[width=0.5 \linewidth]{figures/Healthy-Slight/heatmap.png}
+					\caption{Heatmap Plot for Merged Healthy-Slight Classification with Random Forest}
+					\label{fig:h-sli-heatmap}
+    			\end{figure}
+    		
+    		\subsubsection{Merged Slight-Moderate Class}
+    		
+    		\subsubsection{Merged Moderate-Severe Class}
+    		
+    		\subsubsection{Merged Slight-Acute Class}
+    		
+    		\subsubsection{Merged Moderate-Acute Class}
+    		
+    		\subsubsection{Merged Severe-Acute Class}
     	
     	\subsection{Regression}
     
