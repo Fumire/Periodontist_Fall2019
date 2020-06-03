@@ -107,7 +107,7 @@
     			\label{fig:depth}
     		\end{figure}
     	
-    		Periodontitis is diagnosed by measuring clinical attachment loss (CAL). Note that the CAL is the length of the figure \ref{fig:depth}-1, which is sum of gingival recession (GR) in figure \ref{fig:depth}-2, and probing depth (PD) in figure \ref{fig:depth}-3.
+    		Periodontitis is diagnosed by measuring clinical attachment loss (AL). Note that the AL is the length of the figure \ref{fig:depth}-1, which is sum of gingival recession (GR) in figure \ref{fig:depth}-2, and probing depth (PD) in figure \ref{fig:depth}-3.
     		
     		Periodontitis is generally believed to be a result of a host-parasite interaction in which bacteria are the determinants of periodontitis \cite{ref:cause1}. In etiology, the primary cause of periodontitis is presumed as a bacterial infection as the primary cause of periodontitis \cite{ref:perio1}. Thus, the treatment of periodontitis includes antibiotics and dental surgery.
     		
@@ -124,14 +124,14 @@
 			I aimed to probe the performance of machine learning which predict the severity of periodontitis. Specifically, the purpose of this research is herein-after:
     		\begin{enumerate}
 				\item Classify the stage of periodontitis by oral bacteria.
-				\item Regress the CAL, the GR, or the PD by oral bacteria. 
+				\item Regress the AL, or the PD by oral bacteria. 
     		\end{enumerate}
     
     \section{Materials}
     	\subsection{Clinical Examinations}
 	    	This study included 784 samples from who visited the Department of Periodontics, Pusan National University Dental Hospital, between August 2016 and March 2019. The study protocol was approved by the Institutional Review Board of Pusan National University Dental Hospital (PNUDH-2016-019). All samples are provided written informed consent upon complete information regarding the objectives and procedures of this study.
 	    	
-	    	The diagnosis of samples was completed as \cite{ref:diagnosis1}. Also, the stage of periodontitis was categorized on the basis of the CAL as following:
+	    	The diagnosis of samples was completed as \cite{ref:diagnosis1}. Also, the stage of periodontitis was categorized on the basis of the AL as following:
 	    	\begin{itemize}
 	    		\item Healthy: $\leq$ 1mm
 				\item Slight: 1-2 mm
@@ -146,7 +146,7 @@
 				\item who refused to approve the informed consent form
 	    	\end{itemize}
 	    
-	    	The CAL was measured with a periodontal probe (PGF-W, Osung, Kwangmyung, Republic of Korea) during the clinical evaluation. All measurement were performed by two fully-experienced periodontitsts.
+	    	The AL was measured with a periodontal probe (PGF-W, Osung, Kwangmyung, Republic of Korea) during the clinical evaluation. All measurement were performed by two fully-experienced periodontitsts.
 	    
 	    \subsection{Analysis of Bacterial Copy}
 	    	Collection of mouthwash sample and DAN extraction were performed as \cite{ref:DNA1}. Also, the nine pathogens were chosen as herein-after:
@@ -174,7 +174,7 @@
     		\textit{Pandas} is a Python library of rich data structures and tools for working with structured data sets common to statistics, finances, social sciences, and many other fields \cite{ref:pandas1}.
     		
     		\subsubsection{Scikit-learn: Machine Learning in Python}
-    			\textit{Scikit-learn} is a Python module integrating a wide range of state-of-the-art machine learning algorithms for medium-scale supervised and unsupervised problems \cite{ref:sklearn1}.``
+    			\textit{Scikit-learn} is a Python module integrating a wide range of state-of-the-art machine learning algorithms for medium-scale supervised and unsupervised problems \cite{ref:sklearn1}.
     			    			
     		\subsubsection{Seaborn}
 		   		\textit{Seaborn} is a Python data visualization library based on \textit{matplotlib}. It provides a high-level interface for drawing attractive and informative statistics graphics \cite{ref:seaborn1}.
@@ -240,6 +240,10 @@
 				
 		\subsection{Regression}
 			In regression, every combination of the nine pathogens, $2^9 = 512$ combinations, will be used. 
+			
+			\subsubsection{Welch's $t$-test}
+				$t$-test is a two-sample test which is used to test a hypothesis that two populations have identical means. Student's $t$-test is commonly used. Though, Welch's $t$-test is more robust then Student's $t$-test \cite{ref:ttest1}. Therefore, Welch's $t$-test is adopted to verify null hypothesis. 
+			
 			\subsubsection{Coefficient of Determination}
 				Coefficient of determination, also known as $R^2$ or R-square, is common to use as an index of the size of the relation \cite{ref:rsquare1}. 
 				
@@ -608,7 +612,50 @@
     				\label{fig:s-a-heatmap}
     			\end{figure}
     	
+    	\subsection{Distribution of Depth}
+			In regression, the AL and the PD will be used. Thus, it is required to inspect about the AL and the PD. Figure \ref{fig:scatter} shows the scatter map between the AL and the PD. Also, figure \ref{fig:violin} displays the violin plot between depth and class. Note that follow annotations for figure \ref{fig:violin}:
+			\begin{itemize}
+				\item *: $1.00 \times 10^{-2} < p \leq 5.00 \times 10^{-2}$
+				\item **: $1.00 \times 10^{-3} < p \leq 5.00 \times 10^{-2}$
+				\item ***: $1.00 \times 10^{-4} < p \leq 5.00 \times 10^{-3}$
+				\item ****: $p \leq 5.00 \times 10^{-4}$
+			\end{itemize}
+    		
+    		\begin{figure}[htbp]
+				\centering
+				\includegraphics[width=0.5 \linewidth]{figures/scatter.png}
+				\caption{Scatter Map between AL and PD}
+				\label{fig:scatter}
+    		\end{figure}
+    	
+    		\begin{figure}[htbp]
+				\centering
+				$\begin{array}{cc}
+					\includegraphics[width=0.4 \linewidth]{figures/Violin/AL.png}
+					&
+					\includegraphics[width=0.4 \linewidth]{figures/Violin/PD.png}
+					\\
+					\mbox{(a) AL} & \mbox{(b) PD} \\
+				\end{array}$
+				\caption{Violin Plot between Depth and Class}
+				\label{fig:violin}
+    		\end{figure}
+    	
     	\subsection{Regression}
+    		Figure \ref{fig:r-square} displays the R-square value in regression. 
+    	
+    		\begin{figure}[htbp]
+    			\centering
+				$\begin{array}{cc}
+					\includegraphics[width=0.4 \linewidth]{figures/Regression/AL.png}
+					&
+					\includegraphics[width=0.4 \linewidth]{figures/Regression/PD.png}
+					\\
+					\mbox{(a) AL} & \mbox{(b) PD} \\
+				\end{array}$
+				\caption{R-Square Value of Regression}
+				\label{fig:r-square}
+    		\end{figure}
     
     \section{Discussion}
     
