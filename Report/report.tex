@@ -1,6 +1,6 @@
 % !TeX spellcheck = en_US
 % !TeX encoding = UTF-8
-\documentclass[aps, 11pt, a4paper]{article}
+\documentclass[11pt, a4paper]{article}
 \usepackage{graphics, graphicx}
 \usepackage{fancyvrb, enumerate}
 \usepackage{amsmath, amssymb, amscd, amsfonts}
@@ -412,7 +412,7 @@
 				\begin{figure}[htbp]
 					\centering
 					\includegraphics[width=0.5 \linewidth]{figures/Slight-Moderate/heatmap.png}
-					\caption{Heatmap Plot for Merged Slight-Moderate Classification with Random Forest}
+					\caption{Heatmap Plot for Merged Slight-Moderate Classification with K-Neighbor}
 					\label{fig:sli-m-heatmap}
 				\end{figure}
     		
@@ -461,7 +461,7 @@
     			\begin{figure}[htbp]
     				\centering
     				\includegraphics[width=0.5 \linewidth]{figures/Slight-Moderate/heatmap.png}
-    				\caption{Heatmap Plot for Merged Slight-Moderate Classification with Random Forest}
+    				\caption{Heatmap Plot for Merged Moderate-Severe Classification with Random Forest}
     				\label{fig:m-s-heatmap}
     			\end{figure}
     		
@@ -608,7 +608,7 @@
     			\begin{figure}[htbp]
     				\centering
     				\includegraphics[width=0.5 \linewidth]{figures/Severe-Acute/heatmap.png}
-    				\caption{Heatmap Plot for Merged Severe-Acute Classification with Random Forest}
+    				\caption{Heatmap Plot for Merged Severe-Acute Classification with RBF-SVC}
     				\label{fig:s-a-heatmap}
     			\end{figure}
     	
@@ -658,11 +658,24 @@
     		\end{figure}
     
     \section{Discussion}
-    
+    	\subsection{Classification}
+    		Many intense studies \cite{ref:different1, ref:different2} imply that there are statistically differences of bacteria population between each stage of periododontitis. There are no doubt in which machine learning process will find the strategy to classify amongst periodontal classes. It is sustained as figure \ref{fig:5-confusion}, the accuracy is over 80 \%. Moreover, as figure \ref{fig:5-heatmap}, most of missed prediction has been predicted neighbor classes. Thus, it is believed that many indicators such as accuracy will be better while combining neighbor classes. 
+    		
+			Figures \ref{fig:h-sli-confusion}, \ref{fig:sli-m-confusion} and \ref{fig:m-s-confusion} show that the indicators are far from improving. Only three classes are predicted as figures \ref{fig:h-sli-confusion}, \ref{fig:sli-m-confusion} and ref{fig:m-s-heatmap}; in other words, the acute class was dropped from prediction. This is happened by two major reasons. First, there are only four cases in acute class. Second, as figure \ref{fig:5-confusion}, half of all cases from acute class have similar bacteria population with moderate or severe class. Therefore, classification algorithms get high accuracy even though dropping acute class.
+			
+			Moreover, as mentioned herein-above, acute class has analogous bacteria population with moderate or severe class. Thereupon, it is expected that enhanced result from merged moderate-acute and severe-acute class. As figures \ref{fig:sli-a-heatmap}, \ref{fig:m-a-heatmap} and \ref{fig:s-a-heatmap}, every four classes were predicted; there are no dropped class. Merging severe-acute class has better accuracy than merging moderate-acute class for comparing figure \ref{fig:m-a-confusion} and figure \ref{fig:s-a-confusion}. 
+			
+			The number of used features is main factor for classification. There is a trend which indicator is being better along as many used features. Thus, it is required to perform the process with not only the nine bacteria more bacteria such as \textit{Prevotell intermedia} \cite{ref:pi1} which is related with periodontitis.
+    	
+    	\subsection{Regression}
+    		In figure \ref{fig:scatter}, there is a linear trend on the AL and the PD. Many subjects have same value of the AL and the PD; according to figure \ref{fig:depth}, it implies that many subjects has no GR in their tooth. Also, there are statistically significant differences between each class as figure \ref{fig:violin}. Thus, regression process is expected good result as classification process does.
+    		
+    		However, the result is different as figure \ref{fig:r-square}. The R-square values are near 0.5; this implies that the weak relationship between bacteria and the AL or the PD. Also, the relationship between the number of features and R-square value is not strong as classification. It means that there are driver bacteria, which have major roles in periodontitis; and, the AL and the PD are effected by these driver bacteria. 
+    		
     \section{Acknowledgment}
     	The relative study which based on the identical data has been submitted \textit{American Society for Microbiology} as "Prediction of chronic periodontitis severity using machine learning models based on salivary bacterial copy number". 
     	
-    	I thank all study subjects for their generous participation and the clinicians for their contributions leading to the succesful completion of this study. This work was partly supported by the Technological Innovation R\&D Program (C0445482), funded by the Small and Medium business Administration (SMBA, Republic of Korea). This work also partly supported by the Next-Generation Information Computing Development Program of the National Research Foundation of Korea funded by the Ministry of Science and ICT (NRF-2016M3C4A7952635). This research work was also partly supported by the National Research Foundation (NRF) of Korea grant NRF-2017M3A9B6062026, funded by the government of Republic of Korea. I would like to thank David Whee-Young Choi for constructive criticism of the manuscript. 
+    	I thank all study subjects for their generous participation and the clinicians for their contributions leading to the successful completion of this study. This work was partly supported by the Technological Innovation R\&D Program (C0445482), funded by the Small and Medium business Administration (SMBA, Republic of Korea). This work also partly supported by the Next-Generation Information Computing Development Program of the National Research Foundation of Korea funded by the Ministry of Science and ICT (NRF-2016M3C4A7952635). This research work was also partly supported by the National Research Foundation (NRF) of Korea grant NRF-2017M3A9B6062026, funded by the government of Republic of Korea. I would like to thank David Whee-Young Choi for constructive criticism of the manuscript. 
     
     \addcontentsline{toc}{section}{References}
     \bibliographystyle{IEEEtran}
